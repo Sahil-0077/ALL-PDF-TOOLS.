@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF Tools - All-in-One PDF Utilities</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css">
+    <style>
+        .tool-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            height: 100%;
+        }
+        .tool-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+        .tool-icon {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            color: #dc3545;
+        }
+        .search-container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .header-container, .footer-container {
+            width: 100%;
+        }
+        .category-title {
+            border-left: 5px solid #dc3545;
+            padding-left: 15px;
+        }
+        .ad-container {
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            padding: 20px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        .ad-sidebar {
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            padding: 20px;
+            margin-bottom: 20px;
+            height: 300px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        @media (max-width: 768px) {
+            .tool-icon {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header will be loaded here -->
+    <div class="header-container"></div>
+
+    <main class="container py-5">
+        <!-- Hero Section -->
+        <div class="px-4 py-5 my-5 text-center">
+            <h1 class="display-5 fw-bold text-body-emphasis">All-in-One PDF Tools</h1>
+            <div class="col-lg-6 mx-auto">
+                <p class="lead mb-4">Free online tools to edit, convert, merge, split and perform all PDF operations without installing any software.</p>
+                <div class="search-container">
+                    <div class="input-group mb-3">
+                        <input type="text" id="searchInput" class="form-control form-control-lg" placeholder="Search for PDF tools..." aria-label="Search for PDF tools">
+                        <button class="btn btn-danger" type="button"><i class="bi bi-search"></i></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Ad Banner -->
+        <div class="ad-container mb-5">
+            <h5 class="text-muted">Advertisement</h5>
+            <div style="height: 120px; display: flex; align-items: center; justify-content: center; background-color: #e9ecef;">
+                <span class="text-muted">Ad Space (728x90)</span>
+            </div>
+        </div>
+
+        <div class="row">
+            <!-- Main Content Area (9 columns) -->
+            <div class="col-lg-9">
+                <!-- Convert PDF Section -->
+                <h2 class="category-title mb-4">Convert PDF</h2>
+                <div class="row row-cols-1 row-cols-md-3 g-4 mb-5" id="convertTools">
+                    <div class="col tool-item" data-name="pdf to word">
+                        <a href="pdf-to-word.html" class="text-decoration-none">
+                            <div class="card tool-card">
+                                <div class="card-body text-center">
+                                    <i class="bi bi-file-earmark-word tool-icon"></i>
+                                    <h5 class="card-title">PDF to Word</h5>
+                                    <p class="card-text text-muted">Convert PDF to editable Word document</p>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col tool-item" data-name="pdf to excel">
+                        <a href="pdf-to-excel.html" class="text-decoration-none">
+                            <div class="card tool-card">
+                                <div class="card-body text-center">
+                                    <i class="bi bi-file-earmark-excel tool-icon"></i>
+                                    <h5 class="card-title">PDF to Excel</h5>
+                                    <p class="card-text text-muted">Convert PDF to Excel spreadsheet</p>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col tool-item" data-name="pdf to powerpoint">
+                        <a href="pdf-to-powerpoint.html" class="text-decoration-none">
+                            <div class="card tool-card">
+                                <div class="card-body text-center">
+                                    <i class="bi bi-file-earmark-slides tool-icon"></i>
+                                    <h5 class="card-title">PDF to PowerPoint</h5>
+                                    <p class="card-text text-muted">Convert PDF to PowerPoint presentation</p>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col tool-item" data-name="word to pdf">
+                        <a href="word-to-pdf.html" class="text-decoration-none">
+                            <div class="card tool-card">
+                                <div class="card-body text-center">
+                                    <i class="bi bi-file-earmark-pdf tool-icon"></i>
+                                    <h5 class="card-title">Word to PDF</h5>
+                                    <p class="card-text text-muted">Convert Word document to PDF</p>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col tool-item" data-name="excel to pdf">
+                        <a href="excel-to-pdf.html" class="text-decoration-none">
+                            <div class="card tool-card">
+                                <div class="card-body text-center">
+                                    <i class="bi bi-file-earmark-pdf tool-icon"></i>
+                                    <h5 class="card-title">Excel to PDF</h5>
+                                    <p class="card-text text-muted">Convert Excel spreadsheet to PDF</p>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col tool-item" data-name="powerpoint to pdf">
+                        <a href="powerpoint-to-pdf.html" class="text-decoration-none">
+                            <div class="card tool-card">
+                                <div class="card-body text-center">
+                                    <i class="bi bi-file-earmark-pdf tool-icon"></i>
+                                    <h5 class="card-title">PowerPoint to PDF</h5>
+                                    <p class="card-text text-muted">Convert PowerPoint presentation to PDF</p>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col tool-item" data-name="pdf to jpg">
+                        <a href="pdf-to-jpg.html" class="text-decoration-none">
+                            <div class="card tool-card">
+                                <div class="card-body text-center">
+                                    <i class="bi bi-file-earmark-image tool-icon"></i>
+                                    <h5 class="card-title">PDF to JPG</h5>
+                                    <p class="card-text text-muted">Convert PDF pages to JPG images</p>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col tool-item" data-name="jpg to pdf">
+                        <a href="jpg-to-pdf.html" class="text-decoration-none">
+                            <div class="card tool-card">
+                                <div class="card-body text-center">
+                                    <i class="bi bi-file-earmark-pdf tool-icon"></i>
+                                    <h5 class="card-title">JPG to PDF</h5>
+                                    <p class="card-text text-muted">Convert JPG images to PDF</p>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col tool-item" data-name="html to pdf">
+                        <a href="html-to-pdf.html" class="text-decoration-none">
+                            <div class="card tool-card">
+                                <div class="card-body text-center">
+                                    <i class="bi bi-code-square tool-icon"></i>
+                                    <h5 class="card-title">HTML to PDF</h5>
+                                    <p class="card-text text-muted">Convert HTML to PDF document</p>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Mid-page Ad -->
+                <div class="ad-container mb-5">
+                    <h5 class="text-muted">Advertisement</h5>
+                    <div style="height: 120px; display: flex; align-items: center; justify-content: center; background-color: #e9ecef;">
+                        <span class="text-muted">Ad Space (728x90)</span>
+                    </div>
+                </div>
+
+                <!-- Edit PDF Section -->
+                <h2 class="category-title mb-4">Edit & Modify PDF</h2>
+                <div class="row row-cols-1 row-cols-md-3 g-4 mb-5" id="editTools">
+                    <div class="col tool-item" data-name="merge pdf">
+                        <a href="merge-pdf.html" class="text-decoration-none">
+                            <div class="card tool-card">
+                                <div class="card-body text-center">
+                                    <i class="bi bi-file-earmark-plus tool-icon"></i>
+                                    <h5 class="card-title">Merge PDF</h5>
+                                    <p class="card-text text-muted">Combine multiple PDFs into one file</p>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col tool-item" data-name="split pdf">
+                        <a href="split-pdf.html" class="text-decoration-none">
+                            <div class="card tool-card">
+                                <div class="card-body text-center">
+                                    <i class="bi bi-file-earmark-break tool-icon"></i>
+                                    <h5 class="card-title">Split PDF</h5>
+                                    <p class="card-text text-muted">Extract pages from a PDF file</p>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col tool-item" data-name="compress pdf">
+                        <a href="compress-pdf.html" class="text-decoration-none">
+                            <div class="card tool-card">
+                                <div class="card-body text-center">
+                                    <i class="bi bi-file-earmark-zip tool-icon"></i>
+                                    <h5 class="card-title">Compress PDF</h5>
+                                    <p class="card-text text-muted">Reduce PDF file size</p>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col tool-item" data-name="edit pdf">
+                        <a href="edit-pdf.html" class="text-decoration-none">
+                            <div class="card tool-card">
+                                <div class="card-body text-center">
+                                    <i class="bi bi-pencil-square tool-icon"></i>
+                                    <h5 class="card-title">Edit PDF</h5>
+                                    <p class="card-text text-muted">Edit text and images in PDF</p>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col tool-item" data-name="rotate pdf">
+                        <a href="rotate-pdf.html" class="text-decoration-none">
+                            <div class="card tool-card">
+                                <div class="card-body text-center">
+                                    <i class="bi bi-arrow-clockwise tool-icon"></i>
+                                    <h5 class="card-title">Rotate PDF</h5>
+                                    <p class="card-text text-muted">Rotate PDF pages permanently</p>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col tool-item" data-name="organize pdf">
+                        <a href="organize-pdf.html" class="text-decoration-none">
+                            <div class="card tool-card">
+                                <div class="card-body text-center">
+                                    <i class="bi bi-layout-wtf tool-icon"></i>
+                                    <h5 class="card-title">Organize PDF</h5>
+                                    <p class="card-text text-muted">Rearrange pages in PDF file</p>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col tool-item" data-name="crop pdf">
+                        <a href="crop-pdf.html" class="text-decoration-none">
+                            <div class="card tool-card">
+                                <div class="card-body text-center">
+                                    <i class="bi bi-crop tool-icon"></i>
+                                    <h5 class="card-title">Crop PDF</h5>
+                                    <p class="card-text text-muted">Crop PDF pages</p>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col tool-item" data-name="add page numbers">
+                        <a href="page-number.html" class="text-decoration-none">
+                            <div class="card tool-card">
+                                <div class="card-body text-center">
+                                    <i class="bi bi-list-ol tool-icon"></i>
+                                    <h5 class="card-title">Page Numbers</h5>
+                                    <p class="card-text text-muted">Add page numbers to PDF</p>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Security & More Section -->
+                <h2 class="category-title mb-4">Security & Advanced</h2>
+                <div class="row row-cols-1 row-cols-md-3 g-4 mb-5" id="securityTools">
+                    <div class="col tool-item" data-name="sign pdf">
+                        <a href="sign-pdf.html" class="text-decoration-none">
+                            <div class="card tool-card">
+                                <div class="card-body text-center">
+                                    <i class="bi bi-pen tool-icon"></i>
+                                    <h5 class="card-title">Sign PDF</h5>
+                                    <p class="card-text text-muted">Add digital signature to PDF</p>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col tool-item" data-name="watermark pdf">
+                        <a href="watermark-pdf.html" class="text-decoration-none">
+                            <div class="card tool-card">
+                                <div class="card-body text-center">
+                                    <i class="bi bi-upc-scan tool-icon"></i>
+                                    <h5 class="card-title">Watermark PDF</h5>
+                                    <p class="card-text text-muted">Add watermark to PDF pages</p>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col tool-item" data-name="unlock pdf">
+                        <a href="unlock-pdf.html" class="text-decoration-none">
+                            <div class="card tool-card">
+                                <div class="card-body text-center">
+                                    <i class="bi bi-unlock tool-icon"></i>
+                                    <h5 class="card-title">Unlock PDF</h5>
+                                    <p class="card-text text-muted">Remove password from PDF</p>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col tool-item" data-name="protect pdf">
+                        <a href="protect-pdf.html" class="text-decoration-none">
+                            <div class="card tool-card">
+                                <div class="card-body text-center">
+                                    <i class="bi bi-lock tool-icon"></i>
+                                    <h5 class="card-title">Protect PDF</h5>
+                                    <p class="card-text text-muted">Add password to PDF</p>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col tool-item" data-name="pdf to pdfa">
+                        <a href="pdf-to-pdfa.html" class="text-decoration-none">
+                            <div class="card tool-card">
+                                <div class="card-body text-center">
+                                    <i class="bi bi-file-earmark-check tool-icon"></i>
+                                    <h5 class="card-title">PDF to PDF/A</h5>
+                                    <p class="card-text text-muted">Convert PDF to archival format</p>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col tool-item" data-name="repair pdf">
+                        <a href="repair-pdf.html" class="text-decoration-none">
+                            <div class="card tool-card">
+                                <div class="card-body text-center">
+                                    <i class="bi bi-wrench-adjustable tool-icon"></i>
+                                    <h5 class="card-title">Repair PDF</h5>
+                                    <p class="card-text text-muted">Fix corrupted PDF files</p>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col tool-item" data-name="ocr pdf">
+                        <a href="ocr-pdf.html" class="text-decoration-none">
+                            <div class="card tool-card">
+                                <div class="card-body text-center">
+                                    <i class="bi bi-file-earmark-text tool-icon"></i>
+                                    <h5 class="card-title">OCR PDF</h5>
+                                    <p class="card-text text-muted">Make scanned PDF searchable</p>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col tool-item" data-name="compare pdf">
+                        <a href="compare-pdf.html" class="text-decoration-none">
+                            <div class="card tool-card">
+                                <div class="card-body text-center">
+                                    <i class="bi bi-file-diff tool-icon"></i>
+                                    <h5 class="card-title">Compare PDF</h5>
+                                    <p class="card-text text-muted">Find differences between PDFs</p>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col tool-item" data-name="redact pdf">
+                        <a href="redact-pdf.html" class="text-decoration-none">
+                            <div class="card tool-card">
+                                <div class="card-body text-center">
+                                    <i class="bi bi-marker tool-icon"></i>
+                                    <h5 class="card-title">Redact PDF</h5>
+                                    <p class="card-text text-muted">Permanently remove sensitive info</p>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col tool-item" data-name="scan to pdf">
+                        <a href="scan-to-pdf.html" class="text-decoration-none">
+                            <div class="card tool-card">
+                                <div class="card-body text-center">
+                                    <i class="bi bi-camera tool-icon"></i>
+                                    <h5 class="card-title">Scan to PDF</h5>
+                                    <p class="card-text text-muted">Create PDF from scanned documents</p>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sidebar (3 columns) -->
+            <div class="col-lg-3">
+                <div class="ad-sidebar mb-4">
+                    <h5 class="text-muted">Advertisement</h5>
+                    <div style="width: 100%; height: 250px; display: flex; align-items: center; justify-content: center; background-color: #e9ecef;">
+                        <span class="text-muted">Ad Space (300x250)</span>
+                    </div>
+                </div>
+
+                <div class="card mb-4">
+                    <div class="card-header bg-danger text-white">
+                        <h5 class="mb-0">Most Popular Tools</h5>
+                    </div>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item"><a href="merge-pdf.html" class="text-decoration-none"><i class="bi bi-file-earmark-plus me-2"></i>Merge PDF</a></li>
+                        <li class="list-group-item"><a href="compress-pdf.html" class="text-decoration-none"><i class="bi bi-file-earmark-zip me-2"></i>Compress PDF</a></li>
+                        <li class="list-group-item"><a href="pdf-to-word.html" class="text-decoration-none"><i class="bi bi-file-earmark-word me-2"></i>PDF to Word</a></li>
+                        <li class="list-group-item"><a href="jpg-to-pdf.html" class="text-decoration-none"><i class="bi bi-file-earmark-pdf me-2"></i>JPG to PDF</a></li>
+                        <li class="list-group-item"><a href="word-to-pdf.html" class="text-decoration-none"><i class="bi bi-file-earmark-pdf me-2"></i>Word to PDF</a></li>
+                    </ul>
+                </div>
+
+                <div class="ad-sidebar">
+                    <h5 class="text-muted">Advertisement</h5>
+                    <div style="width: 100%; height: 250px; display: flex; align-items: center; justify-content: center; background-color: #e9ecef;">
+                        <span class="text-muted">Ad Space (300x250)</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer will be loaded here -->
+    <div class="footer-container"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Load header and footer
+        document.addEventListener('DOMContentLoaded', function() {
+            // Load header
+            fetch('header.html')
+                .then(response => response.text())
+                .then(data => {
+                    document.querySelector('.header-container').innerHTML = data;
+                })
+                .catch(error => {
+                    console.error('Error loading header:', error);
+                    document.querySelector('.header-container').innerHTML = '<header class="bg-danger text-white py-3"><div class="container"><h1>PDF Tools</h1></div></header>';
+                });
+
+            // Load footer
+            fetch('footer.html')
+                .then(response => response.text())
+                .then(data => {
+                    document.querySelector('.footer-container').innerHTML = data;
+                })
+                .catch(error => {
+                    console.error('Error loading footer:', error);
+                    document.querySelector('.footer-container').innerHTML = '<footer class="bg-dark text-white py-4"><div class="container"><p>&copy; 2023 PDF Tools. All rights reserved.</p></div></footer>';
+                });
+
+            // Search functionality
+            document.getElementById('searchInput').addEventListener('input', function() {
+                const searchTerm = this.value.toLowerCase();
+                const toolItems = document.querySelectorAll('.tool-item');
+                
+                toolItems.forEach(item => {
+                    const toolName = item.getAttribute('data-name');
+                    if (toolName.includes(searchTerm)) {
+                        item.style.display = 'block';
+                    } else {
+                        item.style.display = 'none';
+                    }
+                });
+                
+                // Show message if no results found
+                const convertTools = document.getElementById('convertTools');
+                const editTools = document.getElementById('editTools');
+                const securityTools = document.getElementById('securityTools');
+                
+                const showNoResults = (container, categoryTitle) => {
+                    if (Array.from(container.querySelectorAll('.tool-item')).every(item => item.style.display === 'none')) {
+                        if (!container.querySelector('.no-results')) {
+                            const noResultsMsg = document.createElement('div');
+                            noResultsMsg.className = 'col-12 no-results';
+                            noResultsMsg.innerHTML = '<div class="alert alert-light text-center">No matching tools found in this category</div>';
+                            container.appendChild(noResultsMsg);
+                        }
+                    } else {
+                        const noResults = container.querySelector('.no-results');
+                        if (noResults) {
+                            noResults.remove();
+                        }
+                    }
+                };
+                
+                showNoResults(convertTools, 'Convert PDF');
+                showNoResults(editTools, 'Edit & Modify PDF');
+                showNoResults(securityTools, 'Security & Advanced');
+            });
+        });
+    </script>
+</body>
+</html>
