@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rotate PDF - Rotate PDF Pages Online</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.2.1/css/all.min.css" rel="stylesheet">
+    <style>
+        .drag-area {
+            border: 2px dashed #6c63ff;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+        }
+        .drag-area.active {
+            border-color: #4BB543;
+            background-color: rgba(75, 181, 67, 0.1);
+        }
+        .file-item {
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            margin-bottom: 8px;
+            transition: all 0.3s ease;
+        }
+        .file-item:hover {
+            background-color: #e9ecef;
+        }
+        .ad-container {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 15px 0;
+            text-align: center;
+        }
+        #header-placeholder, #footer-placeholder {
+            width: 100%;
+        }
+        .rotate-option {
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            padding: 15px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .rotate-option:hover {
+            border-color: #6c63ff;
+        }
+        .rotate-option.selected {
+            border-color: #6c63ff;
+            background-color: rgba(108, 99, 255, 0.05);
+        }
+    </style>
+</head>
+<body class="bg-gray-50 font-sans">
+    <div id="header-placeholder"></div>
+
+    <main class="container mx-auto py-6 px-4">
+        <div class="bg-white shadow-md rounded-lg p-6 mb-6">
+            <h1 class="text-2xl md:text-3xl font-bold text-center text-indigo-700 mb-6">Rotate PDF Pages</h1>
+            
+            <div class="ad-container">
+                <p class="text-gray-500">Advertisement</p>
+            </div>
+            
+            <div class="mb-6">
+                <p class="text-gray-700 mb-4">Rotate pages in your PDF documents. Fix upside-down pages or change orientation as needed.</p>
+                
+                <div class="bg-blue-50 border-l-4 border-blue-500 text-blue-700 p-4 mb-6" role="alert">
+                    <p class="font-bold">Features:</p>
+                    <ul class="list-disc ml-5">
+                        <li>Rotate all pages or specific pages</li>
+                        <li>90° clockwise or counter-clockwise</li>
+                        <li>180° rotation</li>
+                        <li>Preview before saving</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="drag-area h-60 flex flex-col justify-center items-center p-4 mb-6">
+                <i class="fas fa-cloud-upload-alt text-indigo-500 text-5xl mb-4"></i>
+                <h3 class="text-xl font-semibold mb-2">Drag & Drop PDF File Here</h3>
+                <p class="text-gray-500 text-center mb-4">or</p>
+                <button id="browse-btn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-6 rounded-md transition duration-300">
+                    Browse File
+                </button>
+                <input type="file" id="file-input" accept=".pdf" class="hidden">
+            </div>
+            
+            <div id="file-list-container" class="mb-6 hidden">
+                <h3 class="text-lg font-semibold mb-3">Selected File:</h3>
+                <div id="file-list" class="mb-4">
+                    <!-- File will be listed here -->
+                </div>
+                
+                <div class="mb-6">
+                    <h3 class="text-lg font-semibold mb-3">Rotation Options:</h3>
+                    <div class="grid md:grid-cols-3 gap-4 mb-4">
+                        <div class="rotate-option selected" data-degrees="90">
+                            <div class="flex flex-col items-center">
+                                <i class="fas fa-redo text-indigo-500 text-3xl mb-2"></i>
+                                <h4 class="font-semibold">90° Clockwise</h4>
+                            </div>
+                        </div>
+                        <div class="rotate-option" data-degrees="-90">
+                            <div class="flex flex-col items-center">
+                                <i class="fas fa-undo text-indigo-500 text-3xl mb-2"></i>
+                                <h4 class="font-semibold">90° Counter-clockwise</h4>
+                            </div>
+                        </div>
+                        <div class="rotate-option" data-degrees="180">
+                            <div class="flex flex-col items-center">
+                                <i class="fas fa-sync-alt text-indigo-500 text-3xl mb-2"></i>
+                                <h4 class="font-semibold">180° Flip</h4>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label class="block text-gray-700 mb-2">Pages to rotate:</label>
+                        <input type="text" id="rotate-pages" class="border rounded w-full px-3 py-2" placeholder="All pages (leave blank) or e.g. 1,3-5,7">
+                    </div>
+                </div>
+                
+                <div class="flex flex-col md:flex-row justify-center gap-4 mb-4">
+                    <button id="clear-btn" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-6 rounded-md transition duration-300">
+                        Clear
+                    </button>
+                    <button id="rotate-btn" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-6 rounded-md transition duration-300">
+                        Rotate PDF
+                    </button>
+                </div>
+            </div>
+            
+            <div id="processing" class="hidden text-center py-4">
+                <div class="animate-spin rounded-full h-12 w-12 border-t-4 border-indigo-500 border-solid mx-auto mb-4"></div>
+                <p class="text-lg text-gray-700">Rotating PDF pages...</p>
+            </div>
+            
+            <div id="result" class="hidden bg-green-50 border border-green-200 rounded-lg p-6 text-center">
+                <i class="fas fa-check-circle text-green-500 text-5xl mb-4"></i>
+                <h3 class="text-xl font-semibold mb-2">PDF Successfully Rotated!</h3>
+                <p class="text-gray-700 mb-4">Your rotated PDF is ready to download.</p>
+                <button id="download-btn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-6 rounded-md transition duration-300">
+                    Download Rotated PDF
+                </button>
+            </div>
+            
+            <div class="mt-8">
+                <h3 class="text-xl font-semibold mb-4">How to Rotate PDF Pages</h3>
+                <ol class="list-decimal ml-5 text-gray-700">
+                    <li class="mb-2">Upload your PDF file with pages that need rotating.</li>
+                    <li class="mb-2">Select the rotation direction (clockwise, counter-clockwise, or 180° flip).</li>
+                    <li class="mb-2">Specify which pages to rotate (leave blank for all pages).</li>
+                    <li class="mb-2">Click the "Rotate PDF" button to apply the changes.</li>
+                    <li class="mb-2">Download your rotated PDF document.</li>
+                </ol>
+            </div>
+        </div>
+        
+        <div class="bg-white shadow-md rounded-lg p-6 mb-6">
+            <h2 class="text-xl font-bold mb-4">Why Rotate PDF Pages</h2>
+            <div class="grid md:grid-cols-3 gap-6">
+                <div class="text-center">
+                    <i class="fas fa-file-import text-indigo-500 text-3xl mb-3"></i>
+                    <h3 class="font-semibold mb-2">Fix Scanned Documents</h3>
+                    <p class="text-gray-600">Correct pages that were scanned upside down.</p>
+                </div>
+                <div class="text-center">
+                    <i class="fas fa-mobile-alt text-indigo-500 text-3xl mb-3"></i>
+                    <h3 class="font-semibold mb-2">Mobile Uploads</h3>
+                    <p class="text-gray-600">Fix documents photographed with incorrect orientation.</p>
+                </div>
+                <div class="text-center">
+                    <i class="fas fa-print text-indigo-500 text-3xl mb-3"></i>
+                    <h3 class="font-semibold mb-2">Prepare for Printing</h3>
+                    <p class="text-gray-600">Ensure all pages have the correct orientation before printing.</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="ad-container">
+            <p class="text-gray-500">Advertisement</p>
+        </div>
+    </main>
+
+    <div id="footer-placeholder"></div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetch('header.html')
+                .then(response => response.text())
+                .then(data => {
+                    document.getElementById('header-placeholder').innerHTML = data;
+                });
+                
+            fetch('footer.html')
+                .then(response => response.text())
+                .then(data => {
+                    document.getElementById('footer-placeholder').innerHTML = data;
+                });
+            
+            // Rotation option selection
+            const rotateOptions = document.querySelectorAll('.rotate-option');
+            let selectedRotation = 90;
+            
+            rotateOptions.forEach(option => {
+                option.addEventListener('click', function() {
+                    rotateOptions.forEach(opt => opt.classList.remove('selected'));
+                    this.classList.add('selected');
+                    selectedRotation = parseInt(this.getAttribute('data-degrees'));
+                });
+            });
+        });
+        
+        const dropArea = document.querySelector('.drag-area');
+        const browseBtn = document.querySelector('#browse-btn');
+        const fileInput = document.querySelector('#file-input');
+        const fileListContainer = document.querySelector('#file-list-container');
+        const fileList = document.querySelector('#file-list');
+        const clearBtn = document.querySelector('#clear-btn');
+        const rotateBtn = document.querySelector('#rotate-btn');
+        const processingDiv = document.querySelector('#processing');
+        const resultDiv = document.querySelector('#result');
+        const downloadBtn = document.querySelector('#download-btn');
+        
+        let selectedFile = null;
+        
+        browseBtn.addEventListener('click', () => fileInput.click());
+        
+        fileInput.addEventListener('change', function() {
+            handleFile(this.files[0]);
+        });
+        
+        ['dragover', 'dragleave', 'drop'].forEach(eventName => {
+            dropArea.addEventListener(eventName, preventDefaults, false);
+        });
+        
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+        
+        dropArea.addEventListener('dragover', function() {
+            this.classList.add('active');
+        });
+        
+        dropArea.addEventListener('dragleave', function() {
+            this.classList.remove('active');
+        });
+        
+        dropArea.addEventListener('drop', function(e) {
+            this.classList.remove('active');
+            handleFile(e.dataTransfer.files[0]);
+        });
+        
+        function handleFile(file) {
+            if (file && file.type === 'application/pdf') {
+                selectedFile = file;
+                displayFile();
+                fileListContainer.classList.remove('hidden');
+            }
+        }
+        
+        function displayFile() {
+            fileList.innerHTML = '';
+            
+            const fileItem = document.createElement('div');
+            fileItem.className = 'file-item flex justify-between items-center p-3';
+            fileItem.innerHTML = `
+                <div class="flex items-center">
+                    <i class="fas fa-file-pdf text-red-500 text-xl mr-3"></i>
+                    <span class="text-gray-800">${selectedFile.name}</span>
+                </div>
+                <button class="remove-btn text-red-500 hover:text-red-700">
+                    <i class="fas fa-times"></i>
+                </button>
+            `;
+            fileList.appendChild(fileItem);
+            
+            document.querySelector('.remove-btn').addEventListener('click', function() {
+                selectedFile = null;
+                fileList.innerHTML = '';
+                fileListContainer.classList.add('hidden');
+            });
+        }
+        
+        clearBtn.addEventListener('click', function() {
+            selectedFile = null;
+            fileList.innerHTML = '';
+            fileListContainer.classList.add('hidden');
+        });
+        
+        rotateBtn.addEventListener('click', function() {
+            if (!selectedFile) {
+                alert('Please select a PDF file to rotate.');
+                return;
+            }
+            
+            fileListContainer.classList.add('hidden');
+            processingDiv.classList.remove('hidden');
+            
+            setTimeout(() => {
+                processingDiv.classList.add('hidden');
+                resultDiv.classList.remove('hidden');
+            }, 3000);
+        });
+        
+        downloadBtn.addEventListener('click', function() {
+            alert('In production, this would download your rotated PDF file.');
+        });
+    </script>
+</body>
+</html>
