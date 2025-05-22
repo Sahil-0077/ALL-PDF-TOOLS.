@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Header - PDF Tools Website</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.2.1/css/all.min.css">
+    <style>
+        .navbar-fixed {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+        
+        .search-results {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            max-height: 300px;
+            overflow-y: auto;
+            z-index: 50;
+        }
+        
+        .search-results.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <header class="bg-white shadow-md">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col md:flex-row justify-between items-center py-4">
+                <!-- Logo -->
+                <div class="flex items-center mb-3 md:mb-0">
+                    <a href="index.html" class="flex items-center">
+                        <i class="fas fa-file-pdf text-red-600 text-3xl mr-2"></i>
+                        <span class="text-xl font-bold text-gray-800">PDF Tools</span>
+                    </a>
+                </div>
+                
+                <!-- Navigation -->
+                <nav class="flex flex-wrap justify-center mb-3 md:mb-0">
+                    <a href="index.html" class="px-3 py-2 text-gray-700 hover:text-red-600 transition duration-300">Home</a>
+                    <a href="#convert" class="px-3 py-2 text-gray-700 hover:text-red-600 transition duration-300">Convert</a>
+                    <a href="#edit" class="px-3 py-2 text-gray-700 hover:text-red-600 transition duration-300">Edit</a>
+                    <a href="#optimize" class="px-3 py-2 text-gray-700 hover:text-red-600 transition duration-300">Optimize</a>
+                    <a href="#security" class="px-3 py-2 text-gray-700 hover:text-red-600 transition duration-300">Security</a>
+                </nav>
+                
+                <!-- Search Bar -->
+                <div class="w-full md:w-auto relative">
+                    <div class="relative">
+                        <input type="text" id="searchInput" placeholder="Search PDF tools..." 
+                               class="w-full md:w-64 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500">
+                        <button class="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-red-600">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                    
+                    <div id="searchResults" class="search-results">
+                        <!-- Search results will be displayed here via JavaScript -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <script>
+        // Function to make the navbar fixed on scroll
+        window.addEventListener('scroll', function() {
+            const header = document.querySelector('header');
+            if (window.scrollY > 100) {
+                header.classList.add('navbar-fixed');
+            } else {
+                header.classList.remove('navbar-fixed');
+            }
+        });
+
+        // Search functionality (will be implemented with the actual tool list)
+        const searchInput = document.getElementById('searchInput');
+        const searchResults = document.getElementById('searchResults');
+        
+        searchInput.addEventListener('focus', () => {
+            searchResults.classList.add('active');
+        });
+        
+        searchInput.addEventListener('blur', () => {
+            // Delayed to allow for clicks on results
+            setTimeout(() => {
+                searchResults.classList.remove('active');
+            }, 200);
+        });
+        
+        // This is a placeholder for the actual search functionality
+        // The full implementation will be done in the main JavaScript file
+        searchInput.addEventListener('input', function() {
+            // Placeholder for search functionality
+            const query = this.value.toLowerCase();
+            if (query.length > 2) {
+                // Show search results container
+                searchResults.classList.add('active');
+                
+                // This will be replaced with actual search logic
+                searchResults.innerHTML = '<p class="p-3">Searching for: ' + query + '</p>';
+            } else {
+                searchResults.classList.remove('active');
+            }
+        });
+    </script>
+</body>
+</html>
