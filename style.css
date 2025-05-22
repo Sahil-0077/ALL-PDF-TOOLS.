@@ -1,0 +1,643 @@
+/* styles.css - Custom CSS for PDF Tools Website */
+
+:root {
+  --primary-color: #4a6cf7;
+  --secondary-color: #6c757d;
+  --accent-color: #ff6b6b;
+  --text-color: #333333;
+  --light-bg: #f8f9fa;
+  --white: #ffffff;
+  --dark-bg: #343a40;
+  --border-color: #dee2e6;
+  --success-color: #28a745;
+  --hover-color: #3a57d0;
+  --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  --transition: all 0.3s ease;
+}
+
+/* Global Styles */
+body {
+  font-family: 'Poppins', sans-serif;
+  line-height: 1.6;
+  color: var(--text-color);
+  background-color: var(--light-bg);
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+}
+
+a {
+  text-decoration: none;
+  color: var(--primary-color);
+  transition: var(--transition);
+}
+
+a:hover {
+  color: var(--hover-color);
+}
+
+.container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 15px;
+}
+
+/* Header Styles */
+.site-header {
+  background-color: var(--white);
+  box-shadow: var(--shadow);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  padding: 15px 0;
+}
+
+.header-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+
+.logo {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--primary-color);
+  display: flex;
+  align-items: center;
+}
+
+.logo i {
+  margin-right: 10px;
+  font-size: 2rem;
+}
+
+.nav-menu {
+  display: flex;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.nav-menu li {
+  margin-left: 20px;
+}
+
+.nav-menu a {
+  font-weight: 500;
+}
+
+.search-container {
+  position: relative;
+  margin: 15px 0;
+  width: 100%;
+}
+
+.search-input {
+  width: 100%;
+  padding: 10px 15px;
+  border: 1px solid var(--border-color);
+  border-radius: 30px;
+  font-size: 16px;
+  transition: var(--transition);
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(74, 108, 247, 0.2);
+}
+
+.search-btn {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: var(--primary-color);
+  cursor: pointer;
+}
+
+.mobile-toggle {
+  display: none;
+  background: none;
+  border: none;
+  color: var(--primary-color);
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+
+/* Hero Section */
+.hero-section {
+  background: linear-gradient(135deg, var(--primary-color), #7367f0);
+  color: var(--white);
+  padding: 60px 0;
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.hero-title {
+  font-size: 2.5rem;
+  margin-bottom: 15px;
+}
+
+.hero-subtitle {
+  font-size: 1.2rem;
+  max-width: 800px;
+  margin: 0 auto 30px;
+  opacity: 0.9;
+}
+
+/* Tools Grid Layout */
+.tools-section {
+  padding: 40px 0;
+}
+
+.section-title {
+  text-align: center;
+  margin-bottom: 40px;
+  font-size: 2rem;
+  color: var(--primary-color);
+}
+
+.tools-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 25px;
+  margin-bottom: 40px;
+}
+
+.tool-card {
+  background-color: var(--white);
+  border-radius: 8px;
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  transition: var(--transition);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.tool-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+}
+
+.card-icon {
+  background-color: rgba(74, 108, 247, 0.1);
+  color: var(--primary-color);
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 15px;
+  font-size: 1.5rem;
+}
+
+.card-body {
+  padding: 20px;
+  flex-grow: 1;
+}
+
+.card-title {
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin: 0 0 10px;
+}
+
+.card-text {
+  color: var(--secondary-color);
+  margin-bottom: 15px;
+}
+
+.btn {
+  display: inline-block;
+  padding: 10px 20px;
+  background-color: var(--primary-color);
+  color: var(--white);
+  border-radius: 5px;
+  font-weight: 500;
+  text-align: center;
+  transition: var(--transition);
+  border: none;
+  cursor: pointer;
+}
+
+.btn:hover {
+  background-color: var(--hover-color);
+  color: var(--white);
+}
+
+.btn-outline {
+  background-color: transparent;
+  border: 1px solid var(--primary-color);
+  color: var(--primary-color);
+}
+
+.btn-outline:hover {
+  background-color: var(--primary-color);
+  color: var(--white);
+}
+
+/* Tool Page Styles */
+.tool-container {
+  background-color: var(--white);
+  border-radius: 8px;
+  box-shadow: var(--shadow);
+  padding: 30px;
+  margin-bottom: 40px;
+}
+
+.tool-header {
+  margin-bottom: 30px;
+  text-align: center;
+}
+
+.tool-title {
+  font-size: 2rem;
+  margin-bottom: 10px;
+  color: var(--primary-color);
+}
+
+.tool-description {
+  color: var(--secondary-color);
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.tool-steps {
+  margin-bottom: 30px;
+}
+
+.step-title {
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+}
+
+.step-title i {
+  margin-right: 10px;
+  color: var(--primary-color);
+}
+
+.file-upload {
+  border: 2px dashed var(--border-color);
+  border-radius: 5px;
+  padding: 40px 20px;
+  text-align: center;
+  margin-bottom: 20px;
+  transition: var(--transition);
+  background-color: var(--light-bg);
+  cursor: pointer;
+}
+
+.file-upload:hover {
+  border-color: var(--primary-color);
+}
+
+.file-upload-icon {
+  font-size: 3rem;
+  color: var(--primary-color);
+  margin-bottom: 15px;
+}
+
+.file-upload-text {
+  margin-bottom: 15px;
+}
+
+.file-input {
+  display: none;
+}
+
+.file-list {
+  list-style: none;
+  padding: 0;
+  margin: 20px 0;
+}
+
+.file-list-item {
+  background-color: var(--light-bg);
+  border-radius: 5px;
+  padding: 10px 15px;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.file-name {
+  display: flex;
+  align-items: center;
+}
+
+.file-name i {
+  margin-right: 10px;
+  color: var(--primary-color);
+}
+
+.remove-file {
+  background: none;
+  border: none;
+  color: var(--accent-color);
+  cursor: pointer;
+}
+
+.tool-options {
+  margin-bottom: 30px;
+}
+
+.option-group {
+  margin-bottom: 20px;
+}
+
+.option-label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 500;
+}
+
+.option-input {
+  width: 100%;
+  padding: 10px 15px;
+  border: 1px solid var(--border-color);
+  border-radius: 5px;
+  font-size: 16px;
+  transition: var(--transition);
+}
+
+.option-input:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(74, 108, 247, 0.2);
+}
+
+.action-buttons {
+  display: flex;
+  gap: 15px;
+  margin-top: 30px;
+}
+
+/* Result Section */
+.result-section {
+  margin-top: 30px;
+  display: none;
+}
+
+.result-section.visible {
+  display: block;
+}
+
+.result-container {
+  background-color: var(--light-bg);
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.download-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Ad Sections */
+.ad-section {
+  margin: 40px 0;
+  text-align: center;
+}
+
+.ad-container {
+  background-color: var(--light-bg);
+  border-radius: 8px;
+  padding: 20px;
+  min-height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sidebar-ad {
+  margin-bottom: 20px;
+}
+
+/* Footer Styles */
+.site-footer {
+  background-color: var(--dark-bg);
+  color: var(--white);
+  padding: 40px 0 20px;
+}
+
+.footer-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 30px;
+  margin-bottom: 30px;
+}
+
+.footer-col h3 {
+  font-size: 1.2rem;
+  margin-bottom: 20px;
+  color: var(--white);
+}
+
+.footer-links {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.footer-links li {
+  margin-bottom: 10px;
+}
+
+.footer-links a {
+  color: rgba(255, 255, 255, 0.7);
+  transition: var(--transition);
+}
+
+.footer-links a:hover {
+  color: var(--white);
+}
+
+.footer-bottom {
+  text-align: center;
+  padding-top: 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.9rem;
+}
+
+/* Utility Classes */
+.text-center {
+  text-align: center;
+}
+
+.mt-3 {
+  margin-top: 1rem;
+}
+
+.mb-3 {
+  margin-bottom: 1rem;
+}
+
+.d-flex {
+  display: flex;
+}
+
+.justify-between {
+  justify-content: space-between;
+}
+
+.align-center {
+  align-items: center;
+}
+
+/* Responsive Styles */
+@media (max-width: 991px) {
+  .hero-title {
+    font-size: 2rem;
+  }
+  
+  .section-title {
+    font-size: 1.8rem;
+  }
+  
+  .tool-title {
+    font-size: 1.8rem;
+  }
+}
+
+@media (max-width: 767px) {
+  .mobile-toggle {
+    display: block;
+  }
+  
+  .nav-menu {
+    flex-direction: column;
+    width: 100%;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+  }
+  
+  .nav-menu.active {
+    max-height: 300px;
+  }
+  
+  .nav-menu li {
+    margin: 10px 0;
+  }
+  
+  .header-container {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .logo-nav-container {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .action-buttons {
+    flex-direction: column;
+  }
+  
+  .btn {
+    width: 100%;
+  }
+}
+
+@media (max-width: 575px) {
+  .hero-title {
+    font-size: 1.8rem;
+  }
+  
+  .hero-subtitle {
+    font-size: 1rem;
+  }
+  
+  .section-title {
+    font-size: 1.5rem;
+  }
+  
+  .tools-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .tool-container {
+    padding: 20px;
+  }
+  
+  .tool-title {
+    font-size: 1.5rem;
+  }
+}
+
+/* Animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animated {
+  animation: fadeIn 0.5s ease forwards;
+}
+
+/* Tooltip */
+.tooltip {
+  position: relative;
+}
+
+.tooltip:hover::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: var(--dark-bg);
+  color: var(--white);
+  padding: 5px 10px;
+  border-radius: 5px;
+  font-size: 0.8rem;
+  white-space: nowrap;
+  z-index: 100;
+}
+
+/* Loader */
+.loader {
+  display: none;
+  width: 48px;
+  height: 48px;
+  border: 5px solid var(--light-bg);
+  border-bottom-color: var(--primary-color);
+  border-radius: 50%;
+  animation: rotation 1s linear infinite;
+  margin: 20px auto;
+}
+
+.loading .loader {
+  display: block;
+}
+
+@keyframes rotation {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
