@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JPG to PDF - Convert Images to PDF Online</title>
+    <title>Sign PDF - Add Digital Signatures to PDF Documents</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.2.1/css/all.min.css" rel="stylesheet">
     <style>
@@ -36,11 +36,10 @@
         #header-placeholder, #footer-placeholder {
             width: 100%;
         }
-        .option-card {
+        .signature-canvas {
             border: 1px solid #dee2e6;
             border-radius: 5px;
-            padding: 15px;
-            margin-bottom: 15px;
+            background-color: white;
         }
     </style>
 </head>
@@ -49,136 +48,190 @@
 
     <main class="container mx-auto py-6 px-4">
         <div class="bg-white shadow-md rounded-lg p-6 mb-6">
-            <h1 class="text-2xl md:text-3xl font-bold text-center text-indigo-700 mb-6">JPG to PDF Converter</h1>
+            <h1 class="text-2xl md:text-3xl font-bold text-center text-indigo-700 mb-6">Sign PDF Documents</h1>
             
             <div class="ad-container">
                 <p class="text-gray-500">Advertisement</p>
             </div>
             
             <div class="mb-6">
-                <p class="text-gray-700 mb-4">Convert your JPG images to PDF documents. Combine multiple images into a single PDF or create one PDF per image.</p>
+                <p class="text-gray-700 mb-4">Add digital signatures to your PDF documents. Draw your signature, type it, or upload an image of your signature.</p>
                 
                 <div class="bg-blue-50 border-l-4 border-blue-500 text-blue-700 p-4 mb-6" role="alert">
                     <p class="font-bold">Features:</p>
                     <ul class="list-disc ml-5">
-                        <li>Convert JPG to high-quality PDF</li>
-                        <li>Combine multiple images into one PDF</li>
-                        <li>Adjust page size and orientation</li>
-                        <li>Support for other image formats (PNG, GIF, BMP)</li>
+                        <li>Add signatures to PDF documents</li>
+                        <li>Draw, type, or upload your signature</li>
+                        <li>Position signature anywhere on the document</li>
+                        <li>Secure and legally binding</li>
                     </ul>
                 </div>
             </div>
             
             <div class="drag-area h-60 flex flex-col justify-center items-center p-4 mb-6">
                 <i class="fas fa-cloud-upload-alt text-indigo-500 text-5xl mb-4"></i>
-                <h3 class="text-xl font-semibold mb-2">Drag & Drop JPG Files Here</h3>
+                <h3 class="text-xl font-semibold mb-2">Drag & Drop PDF File Here</h3>
                 <p class="text-gray-500 text-center mb-4">or</p>
                 <button id="browse-btn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-6 rounded-md transition duration-300">
-                    Browse Files
+                    Browse File
                 </button>
-                <input type="file" id="file-input" accept="image/*" multiple class="hidden">
+                <input type="file" id="file-input" accept=".pdf" class="hidden">
             </div>
             
             <div id="file-list-container" class="mb-6 hidden">
-                <h3 class="text-lg font-semibold mb-3">Selected Files:</h3>
+                <h3 class="text-lg font-semibold mb-3">Selected File:</h3>
                 <div id="file-list" class="mb-4">
-                    <!-- Files will be listed here -->
+                    <!-- File will be listed here -->
                 </div>
                 
                 <div class="mb-6">
-                    <h3 class="text-lg font-semibold mb-3">Conversion Options:</h3>
-                    <div class="option-card">
-                        <div class="flex items-center mb-2">
-                            <input type="radio" id="single-pdf" name="pdf-type" class="mr-2" checked>
-                            <label for="single-pdf" class="font-medium">Combine all images into one PDF</label>
+                    <h3 class="text-lg font-semibold mb-3">Create Your Signature:</h3>
+                    
+                    <div class="grid md:grid-cols-3 gap-4 mb-4">
+                        <div class="text-center">
+                            <button id="draw-tab" class="tab-btn font-medium py-2 px-4 rounded-t-lg border-b-2 border-indigo-500 text-indigo-600">
+                                Draw Signature
+                            </button>
                         </div>
-                        <div class="flex items-center">
-                            <input type="radio" id="multiple-pdf" name="pdf-type" class="mr-2">
-                            <label for="multiple-pdf" class="font-medium">Create separate PDF for each image</label>
+                        <div class="text-center">
+                            <button id="type-tab" class="tab-btn font-medium py-2 px-4 rounded-t-lg border-b-2 border-transparent text-gray-500 hover:text-gray-600">
+                                Type Signature
+                            </button>
+                        </div>
+                        <div class="text-center">
+                            <button id="upload-tab" class="tab-btn font-medium py-2 px-4 rounded-t-lg border-b-2 border-transparent text-gray-500 hover:text-gray-600">
+                                Upload Signature
+                            </button>
                         </div>
                     </div>
                     
-                    <div class="option-card">
-                        <div class="flex items-center mb-2">
-                            <label for="page-size" class="font-medium mr-3">Page size:</label>
-                            <select id="page-size" class="border rounded px-2 py-1">
-                                <option value="auto" selected>Auto (image size)</option>
-                                <option value="a4">A4</option>
-                                <option value="letter">Letter</option>
-                                <option value="legal">Legal</option>
-                            </select>
-                        </div>
-                        
-                        <div class="flex items-center">
-                            <label for="orientation" class="font-medium mr-3">Orientation:</label>
-                            <select id="orientation" class="border rounded px-2 py-1">
-                                <option value="auto" selected>Auto</option>
-                                <option value="portrait">Portrait</option>
-                                <option value="landscape">Landscape</option>
-                            </select>
+                    <div id="draw-signature" class="signature-container">
+                        <canvas id="signature-canvas" class="signature-canvas w-full h-48"></canvas>
+                        <div class="flex justify-between mt-2">
+                            <button id="clear-signature" class="text-red-500 hover:text-red-700">
+                                <i class="fas fa-eraser mr-1"></i> Clear
+                            </button>
+                            <button id="save-signature" class="text-indigo-600 hover:text-indigo-800">
+                                <i class="fas fa-save mr-1"></i> Save Signature
+                            </button>
                         </div>
                     </div>
                     
-                    <div class="option-card">
-                        <div class="flex items-center mb-2">
-                            <input type="checkbox" id="zip" class="mr-2">
-                            <label for="zip" class="font-medium">Download as ZIP (for multiple PDFs)</label>
+                    <div id="type-signature" class="signature-container hidden">
+                        <input type="text" id="typed-signature" class="border rounded w-full px-3 py-2 mb-2" placeholder="Enter your name">
+                        <select id="signature-font" class="border rounded w-full px-3 py-2 mb-2">
+                            <option value="'Dancing Script', cursive">Dancing Script</option>
+                            <option value="'Great Vibes', cursive">Great Vibes</option>
+                            <option value="'Parisienne', cursive">Parisienne</option>
+                            <option value="'Allura', cursive">Allura</option>
+                        </select>
+                        <button id="save-typed-signature" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded">
+                            Save Typed Signature
+                        </button>
+                    </div>
+                    
+                    <div id="upload-signature" class="signature-container hidden">
+                        <div class="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center mb-2">
+                            <i class="fas fa-file-image text-gray-400 text-3xl mb-2"></i>
+                            <p class="text-gray-500">Upload an image of your signature</p>
+                            <input type="file" id="signature-upload" accept="image/*" class="hidden">
+                            <button id="upload-signature-btn" class="mt-2 bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 px-4 rounded">
+                                Select Image
+                            </button>
+                        </div>
+                        <div id="signature-preview" class="hidden text-center">
+                            <img id="signature-image" src="" class="max-h-32 mx-auto mb-2">
+                            <button id="use-uploaded-signature" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded">
+                                Use This Signature
+                            </button>
                         </div>
                     </div>
                 </div>
                 
                 <div class="flex flex-col md:flex-row justify-center gap-4 mb-4">
                     <button id="clear-btn" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-6 rounded-md transition duration-300">
-                        Clear All
+                        Clear
                     </button>
-                    <button id="convert-btn" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-6 rounded-md transition duration-300">
-                        Convert to PDF
+                    <button id="sign-btn" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-6 rounded-md transition duration-300">
+                        Sign PDF
                     </button>
+                </div>
+            </div>
+            
+            <div id="position-signature" class="hidden">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-lg font-semibold">Position Your Signature</h3>
+                    <div class="flex gap-2">
+                        <button id="save-signed-pdf" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-md transition duration-300 text-sm">
+                            Save Signed PDF
+                        </button>
+                        <button id="cancel-signing" class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-md transition duration-300 text-sm">
+                            Cancel
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="border rounded-lg p-4 mb-4">
+                    <div class="pdf-preview border-2 border-dashed border-gray-300 h-96 flex items-center justify-center relative">
+                        <p class="text-gray-500">PDF preview will appear here for signature placement</p>
+                        <div id="signature-placeholder" class="absolute hidden border-2 border-indigo-500 p-2 bg-white bg-opacity-90">
+                            <img id="placed-signature" src="" class="max-h-16">
+                        </div>
+                    </div>
+                    
+                    <div class="flex justify-center mt-4 gap-4">
+                        <button id="move-signature" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded">
+                            <i class="fas fa-arrows-alt mr-2"></i>Move Signature
+                        </button>
+                        <button id="resize-signature" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded">
+                            <i class="fas fa-expand-alt mr-2"></i>Resize
+                        </button>
+                    </div>
                 </div>
             </div>
             
             <div id="processing" class="hidden text-center py-4">
                 <div class="animate-spin rounded-full h-12 w-12 border-t-4 border-indigo-500 border-solid mx-auto mb-4"></div>
-                <p class="text-lg text-gray-700">Converting JPG to PDF...</p>
+                <p class="text-lg text-gray-700">Adding signature to PDF...</p>
             </div>
             
             <div id="result" class="hidden bg-green-50 border border-green-200 rounded-lg p-6 text-center">
                 <i class="fas fa-check-circle text-green-500 text-5xl mb-4"></i>
-                <h3 class="text-xl font-semibold mb-2">JPG Successfully Converted to PDF!</h3>
-                <p class="text-gray-700 mb-4">Your PDF file is ready to download.</p>
+                <h3 class="text-xl font-semibold mb-2">PDF Successfully Signed!</h3>
+                <p class="text-gray-700 mb-4">Your signed PDF is ready to download.</p>
                 <button id="download-btn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-6 rounded-md transition duration-300">
-                    Download PDF
+                    Download Signed PDF
                 </button>
             </div>
             
             <div class="mt-8">
-                <h3 class="text-xl font-semibold mb-4">How to Convert JPG to PDF</h3>
+                <h3 class="text-xl font-semibold mb-4">How to Sign a PDF</h3>
                 <ol class="list-decimal ml-5 text-gray-700">
-                    <li class="mb-2">Upload your JPG images that you want to convert.</li>
-                    <li class="mb-2">Select conversion options (single/multiple PDFs, page size, etc.).</li>
-                    <li class="mb-2">Click the "Convert to PDF" button to transform your images.</li>
-                    <li class="mb-2">Download your PDF document(s) when conversion is complete.</li>
+                    <li class="mb-2">Upload your PDF file that needs signing.</li>
+                    <li class="mb-2">Create your signature by drawing, typing, or uploading an image.</li>
+                    <li class="mb-2">Position your signature on the document where needed.</li>
+                    <li class="mb-2">Save the signed PDF and download it.</li>
                 </ol>
             </div>
         </div>
         
         <div class="bg-white shadow-md rounded-lg p-6 mb-6">
-            <h2 class="text-xl font-bold mb-4">Why Convert JPG to PDF</h2>
+            <h2 class="text-xl font-bold mb-4">Why Sign PDFs Online</h2>
             <div class="grid md:grid-cols-3 gap-6">
                 <div class="text-center">
-                    <i class="fas fa-file-pdf text-indigo-500 text-3xl mb-3"></i>
-                    <h3 class="font-semibold mb-2">Universal Format</h3>
-                    <p class="text-gray-600">PDFs are viewable on any device.</p>
+                    <i class="fas fa-signature text-indigo-500 text-3xl mb-3"></i>
+                    <h3 class="font-semibold mb-2">Legally Binding</h3>
+                    <p class="text-gray-600">Digital signatures are legally valid in most countries.</p>
                 </div>
                 <div class="text-center">
-                    <i class="fas fa-images text-indigo-500 text-3xl mb-3"></i>
-                    <h3 class="font-semibold mb-2">Combine Images</h3>
-                    <p class="text-gray-600">Create multi-page documents from multiple images.</p>
+                    <i class="fas fa-paper-plane text-indigo-500 text-3xl mb-3"></i>
+                    <h3 class="font-semibold mb-2">Quick Signing</h3>
+                    <p class="text-gray-600">Sign documents without printing and scanning.</p>
                 </div>
                 <div class="text-center">
-                    <i class="fas fa-print text-indigo-500 text-3xl mb-3"></i>
-                    <h3 class="font-semibold mb-2">Better Printing</h3>
-                    <p class="text-gray-600">PDFs provide more consistent printing results.</p>
+                    <i class="fas fa-lock text-indigo-500 text-3xl mb-3"></i>
+                    <h3 class="font-semibold mb-2">Secure</h3>
+                    <p class="text-gray-600">More secure than handwritten signatures.</p>
                 </div>
             </div>
         </div>
@@ -203,6 +256,72 @@
                 .then(data => {
                     document.getElementById('footer-placeholder').innerHTML = data;
                 });
+            
+            // Initialize signature canvas
+            const canvas = document.getElementById('signature-canvas');
+            const ctx = canvas.getContext('2d');
+            let isDrawing = false;
+            
+            // Set canvas size
+            canvas.width = canvas.offsetWidth;
+            canvas.height = canvas.offsetHeight;
+            
+            // Drawing functionality
+            canvas.addEventListener('mousedown', startDrawing);
+            canvas.addEventListener('mousemove', draw);
+            canvas.addEventListener('mouseup', stopDrawing);
+            canvas.addEventListener('mouseout', stopDrawing);
+            
+            // Touch support
+            canvas.addEventListener('touchstart', handleTouch);
+            canvas.addEventListener('touchmove', handleTouch);
+            canvas.addEventListener('touchend', stopDrawing);
+            
+            function handleTouch(e) {
+                e.preventDefault();
+                const touch = e.touches[0];
+                const mouseEvent = new MouseEvent(
+                    e.type === 'touchstart' ? 'mousedown' : 'mousemove',
+                    {
+                        clientX: touch.clientX,
+                        clientY: touch.clientY
+                    }
+                );
+                canvas.dispatchEvent(mouseEvent);
+            }
+            
+            function startDrawing(e) {
+                isDrawing = true;
+                draw(e);
+            }
+            
+            function draw(e) {
+                if (!isDrawing) return;
+                
+                ctx.lineWidth = 2;
+                ctx.lineCap = 'round';
+                ctx.strokeStyle = '#000';
+                
+                ctx.lineTo(
+                    e.clientX - canvas.getBoundingClientRect().left,
+                    e.clientY - canvas.getBoundingClientRect().top
+                );
+                ctx.stroke();
+                ctx.beginPath();
+                ctx.moveTo(
+                    e.clientX - canvas.getBoundingClientRect().left,
+                    e.clientY - canvas.getBoundingClientRect().top
+                );
+            }
+            
+            function stopDrawing() {
+                isDrawing = false;
+                ctx.beginPath();
+            }
+            
+            document.getElementById('clear-signature').addEventListener('click', function() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+            });
         });
         
         const dropArea = document.querySelector('.drag-area');
@@ -211,17 +330,45 @@
         const fileListContainer = document.querySelector('#file-list-container');
         const fileList = document.querySelector('#file-list');
         const clearBtn = document.querySelector('#clear-btn');
-        const convertBtn = document.querySelector('#convert-btn');
+        const signBtn = document.querySelector('#sign-btn');
+        const positionSignatureDiv = document.querySelector('#position-signature');
+        const saveSignedPdfBtn = document.querySelector('#save-signed-pdf');
+        const cancelSigningBtn = document.querySelector('#cancel-signing');
         const processingDiv = document.querySelector('#processing');
         const resultDiv = document.querySelector('#result');
         const downloadBtn = document.querySelector('#download-btn');
+        const tabBtns = document.querySelectorAll('.tab-btn');
+        const signatureContainers = document.querySelectorAll('.signature-container');
+        const uploadSignatureBtn = document.querySelector('#upload-signature-btn');
+        const signatureUpload = document.querySelector('#signature-upload');
         
-        let selectedFiles = [];
+        let selectedFile = null;
+        let currentSignature = null;
+        
+        // Tab switching
+        tabBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                // Update active tab
+                tabBtns.forEach(tab => {
+                    tab.classList.remove('border-indigo-500', 'text-indigo-600');
+                    tab.classList.add('border-transparent', 'text-gray-500');
+                });
+                this.classList.add('border-indigo-500', 'text-indigo-600');
+                this.classList.remove('border-transparent', 'text-gray-500');
+                
+                // Show corresponding container
+                const target = this.id.replace('-tab', '-signature');
+                signatureContainers.forEach(container => {
+                    container.classList.add('hidden');
+                });
+                document.getElementById(target).classList.remove('hidden');
+            });
+        });
         
         browseBtn.addEventListener('click', () => fileInput.click());
         
         fileInput.addEventListener('change', function() {
-            handleFiles(this.files);
+            handleFile(this.files[0]);
         });
         
         ['dragover', 'dragleave', 'drop'].forEach(eventName => {
@@ -243,63 +390,126 @@
         
         dropArea.addEventListener('drop', function(e) {
             this.classList.remove('active');
-            handleFiles(e.dataTransfer.files);
+            handleFile(e.dataTransfer.files[0]);
         });
         
-        function handleFiles(uploadedFiles) {
-            const imageFiles = Array.from(uploadedFiles).filter(file => file.type.startsWith('image/'));
-            
-            if (imageFiles.length > 0) {
-                selectedFiles = [...selectedFiles, ...imageFiles];
-                displayFiles();
+        function handleFile(file) {
+            if (file && file.type === 'application/pdf') {
+                selectedFile = file;
+                displayFile();
                 fileListContainer.classList.remove('hidden');
             }
         }
         
-        function displayFiles() {
+        function displayFile() {
             fileList.innerHTML = '';
             
-            selectedFiles.forEach((file, index) => {
-                const fileItem = document.createElement('div');
-                fileItem.className = 'file-item flex justify-between items-center p-3';
-                fileItem.innerHTML = `
-                    <div class="flex items-center">
-                        <i class="fas fa-file-image text-blue-500 text-xl mr-3"></i>
-                        <span class="text-gray-800">${file.name}</span>
-                    </div>
-                    <button class="remove-btn text-red-500 hover:text-red-700" data-index="${index}">
-                        <i class="fas fa-times"></i>
-                    </button>
-                `;
-                fileList.appendChild(fileItem);
-            });
+            const fileItem = document.createElement('div');
+            fileItem.className = 'file-item flex justify-between items-center p-3';
+            fileItem.innerHTML = `
+                <div class="flex items-center">
+                    <i class="fas fa-file-pdf text-red-500 text-xl mr-3"></i>
+                    <span class="text-gray-800">${selectedFile.name}</span>
+                </div>
+                <button class="remove-btn text-red-500 hover:text-red-700">
+                    <i class="fas fa-times"></i>
+                </button>
+            `;
+            fileList.appendChild(fileItem);
             
-            document.querySelectorAll('.remove-btn').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const index = parseInt(this.getAttribute('data-index'));
-                    selectedFiles.splice(index, 1);
-                    displayFiles();
-                    
-                    if (selectedFiles.length === 0) {
-                        fileListContainer.classList.add('hidden');
-                    }
-                });
+            document.querySelector('.remove-btn').addEventListener('click', function() {
+                selectedFile = null;
+                fileList.innerHTML = '';
+                fileListContainer.classList.add('hidden');
             });
         }
         
         clearBtn.addEventListener('click', function() {
-            selectedFiles = [];
+            selectedFile = null;
+            currentSignature = null;
             fileList.innerHTML = '';
             fileListContainer.classList.add('hidden');
         });
         
-        convertBtn.addEventListener('click', function() {
-            if (selectedFiles.length === 0) {
-                alert('Please select at least one image file to convert.');
+        // Save drawn signature
+        document.getElementById('save-signature').addEventListener('click', function() {
+            const canvas = document.getElementById('signature-canvas');
+            currentSignature = canvas.toDataURL();
+            alert('Signature saved! Now click "Sign PDF" to place it on your document.');
+        });
+        
+        // Save typed signature
+        document.getElementById('save-typed-signature').addEventListener('click', function() {
+            const text = document.getElementById('typed-signature').value;
+            const font = document.getElementById('signature-font').value;
+            
+            if (!text) {
+                alert('Please enter your signature text');
+                return;
+            }
+            
+            const canvas = document.createElement('canvas');
+            canvas.width = 300;
+            canvas.height = 100;
+            const ctx = canvas.getContext('2d');
+            
+            // Create signature image
+            ctx.font = `30px ${font}`;
+            ctx.fillStyle = 'black';
+            ctx.fillText(text, 10, 50);
+            
+            currentSignature = canvas.toDataURL();
+            alert('Signature saved! Now click "Sign PDF" to place it on your document.');
+        });
+        
+        // Handle signature upload
+        uploadSignatureBtn.addEventListener('click', function() {
+            signatureUpload.click();
+        });
+        
+        signatureUpload.addEventListener('change', function() {
+            const file = this.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('signature-image').src = e.target.result;
+                    document.getElementById('signature-preview').classList.remove('hidden');
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+        
+        document.getElementById('use-uploaded-signature').addEventListener('click', function() {
+            currentSignature = document.getElementById('signature-image').src;
+            alert('Signature saved! Now click "Sign PDF" to place it on your document.');
+        });
+        
+        signBtn.addEventListener('click', function() {
+            if (!selectedFile) {
+                alert('Please select a PDF file to sign.');
+                return;
+            }
+            
+            if (!currentSignature) {
+                alert('Please create and save your signature first.');
                 return;
             }
             
             fileListContainer.classList.add('hidden');
+            positionSignatureDiv.classList.remove('hidden');
+            
+            // In a real implementation, this would show the PDF with the signature ready to be placed
+            document.getElementById('placed-signature').src = currentSignature;
+            document.getElementById('signature-placeholder').classList.remove('hidden');
+        });
+        
+        cancelSigningBtn.addEventListener('click', function() {
+            positionSignatureDiv.classList.add('hidden');
+            fileListContainer.classList.remove('hidden');
+        });
+        
+        saveSignedPdfBtn.addEventListener('click', function() {
+            positionSignatureDiv.classList.add('hidden');
             processingDiv.classList.remove('hidden');
             
             setTimeout(() => {
@@ -309,7 +519,7 @@
         });
         
         downloadBtn.addEventListener('click', function() {
-            alert('In production, this would download your PDF file(s).');
+            alert('In production, this would download your signed PDF file.');
         });
     </script>
 </body>
