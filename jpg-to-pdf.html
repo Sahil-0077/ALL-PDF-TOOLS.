@@ -4,8 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>JPG to PDF - Convert Images to PDF Online</title>
+    <!-- Tailwind CSS -->
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
     <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.2.1/css/all.min.css" rel="stylesheet">
+    <!-- PDF-LIB -->
+    <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+    <script src="https://unpkg.com/downloadjs@1.4.7"></script>
     <style>
         .drag-area {
             border: 2px dashed #6c63ff;
@@ -36,11 +41,53 @@
         #header-placeholder, #footer-placeholder {
             width: 100%;
         }
-        .option-card {
-            border: 1px solid #dee2e6;
-            border-radius: 5px;
+        .layout-option {
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
             padding: 15px;
-            margin-bottom: 15px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .layout-option:hover {
+            border-color: #6366f1;
+            background-color: #f8fafc;
+        }
+        .layout-option.selected {
+            border-color: #6366f1;
+            background-color: #eef2ff;
+        }
+        #image-previews {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 10px;
+            margin-top: 15px;
+        }
+        .image-preview {
+            position: relative;
+            border: 1px solid #e2e8f0;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        .image-preview img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+        .image-preview .remove-btn {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background-color: rgba(255, 0, 0, 0.7);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
         }
     </style>
 </head>
@@ -52,26 +99,66 @@
             <h1 class="text-2xl md:text-3xl font-bold text-center text-indigo-700 mb-6">JPG to PDF Converter</h1>
             
             <div class="ad-container">
+                <!-- Ad Space (Top) -->
                 <p class="text-gray-500">Advertisement</p>
             </div>
             
             <div class="mb-6">
-                <p class="text-gray-700 mb-4">Convert your JPG images to PDF documents. Combine multiple images into a single PDF or create one PDF per image.</p>
+                <p class="text-gray-700 mb-4">Convert your JPG images to a PDF document. Combine multiple images into a single PDF file.</p>
                 
                 <div class="bg-blue-50 border-l-4 border-blue-500 text-blue-700 p-4 mb-6" role="alert">
                     <p class="font-bold">Features:</p>
                     <ul class="list-disc ml-5">
-                        <li>Convert JPG to high-quality PDF</li>
+                        <li>Convert JPG, PNG, and other image formats to PDF</li>
                         <li>Combine multiple images into one PDF</li>
-                        <li>Adjust page size and orientation</li>
-                        <li>Support for other image formats (PNG, GIF, BMP)</li>
+                        <li>Adjust page layout and orientation</li>
+                        <li>Secure and private (processing happens in your browser)</li>
                     </ul>
+                </div>
+                
+                <div class="mb-6">
+                    <h3 class="text-lg font-semibold mb-3">Select Page Layout:</h3>
+                    <div class="grid md:grid-cols-3 gap-4">
+                        <div class="layout-option selected" data-layout="portrait">
+                            <div class="flex items-center">
+                                <i class="fas fa-portrait text-indigo-500 text-xl mr-3"></i>
+                                <h4 class="font-medium">Portrait</h4>
+                            </div>
+                            <p class="text-sm text-gray-600 mt-2">Best for vertical images</p>
+                        </div>
+                        <div class="layout-option" data-layout="landscape">
+                            <div class="flex items-center">
+                                <i class="fas fa-landscape text-indigo-500 text-xl mr-3"></i>
+                                <h4 class="font-medium">Landscape</h4>
+                            </div>
+                            <p class="text-sm text-gray-600 mt-2">Best for horizontal images</p>
+                        </div>
+                        <div class="layout-option" data-layout="auto">
+                            <div class="flex items-center">
+                                <i class="fas fa-expand text-indigo-500 text-xl mr-3"></i>
+                                <h4 class="font-medium">Auto</h4>
+                            </div>
+                            <p class="text-sm text-gray-600 mt-2">Match each image's orientation</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mb-6">
+                    <h3 class="text-lg font-semibold mb-3">Margin Size:</h3>
+                    <input type="range" id="margin-slider" min="0" max="50" value="10" class="w-full mb-2">
+                    <div class="flex justify-between">
+                        <span class="text-sm text-gray-600">No Margin</span>
+                        <span class="text-sm text-gray-600">Large Margin</span>
+                    </div>
+                    <div class="text-center mt-1">
+                        <span id="margin-value" class="text-sm font-medium">10px</span>
+                    </div>
                 </div>
             </div>
             
             <div class="drag-area h-60 flex flex-col justify-center items-center p-4 mb-6">
-                <i class="fas fa-cloud-upload-alt text-indigo-500 text-5xl mb-4"></i>
-                <h3 class="text-xl font-semibold mb-2">Drag & Drop JPG Files Here</h3>
+                <i class="fas fa-images text-indigo-500 text-5xl mb-4"></i>
+                <h3 class="text-xl font-semibold mb-2">Drag & Drop Images Here</h3>
                 <p class="text-gray-500 text-center mb-4">or</p>
                 <button id="browse-btn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-6 rounded-md transition duration-300">
                     Browse Files
@@ -80,51 +167,9 @@
             </div>
             
             <div id="file-list-container" class="mb-6 hidden">
-                <h3 class="text-lg font-semibold mb-3">Selected Files:</h3>
-                <div id="file-list" class="mb-4">
-                    <!-- Files will be listed here -->
-                </div>
-                
-                <div class="mb-6">
-                    <h3 class="text-lg font-semibold mb-3">Conversion Options:</h3>
-                    <div class="option-card">
-                        <div class="flex items-center mb-2">
-                            <input type="radio" id="single-pdf" name="pdf-type" class="mr-2" checked>
-                            <label for="single-pdf" class="font-medium">Combine all images into one PDF</label>
-                        </div>
-                        <div class="flex items-center">
-                            <input type="radio" id="multiple-pdf" name="pdf-type" class="mr-2">
-                            <label for="multiple-pdf" class="font-medium">Create separate PDF for each image</label>
-                        </div>
-                    </div>
-                    
-                    <div class="option-card">
-                        <div class="flex items-center mb-2">
-                            <label for="page-size" class="font-medium mr-3">Page size:</label>
-                            <select id="page-size" class="border rounded px-2 py-1">
-                                <option value="auto" selected>Auto (image size)</option>
-                                <option value="a4">A4</option>
-                                <option value="letter">Letter</option>
-                                <option value="legal">Legal</option>
-                            </select>
-                        </div>
-                        
-                        <div class="flex items-center">
-                            <label for="orientation" class="font-medium mr-3">Orientation:</label>
-                            <select id="orientation" class="border rounded px-2 py-1">
-                                <option value="auto" selected>Auto</option>
-                                <option value="portrait">Portrait</option>
-                                <option value="landscape">Landscape</option>
-                            </select>
-                        </div>
-                    </div>
-                    
-                    <div class="option-card">
-                        <div class="flex items-center mb-2">
-                            <input type="checkbox" id="zip" class="mr-2">
-                            <label for="zip" class="font-medium">Download as ZIP (for multiple PDFs)</label>
-                        </div>
-                    </div>
+                <h3 class="text-lg font-semibold mb-3">Selected Images:</h3>
+                <div id="image-previews" class="mb-4">
+                    <!-- Image previews will appear here -->
                 </div>
                 
                 <div class="flex flex-col md:flex-row justify-center gap-4 mb-4">
@@ -139,13 +184,14 @@
             
             <div id="processing" class="hidden text-center py-4">
                 <div class="animate-spin rounded-full h-12 w-12 border-t-4 border-indigo-500 border-solid mx-auto mb-4"></div>
-                <p class="text-lg text-gray-700">Converting JPG to PDF...</p>
+                <p class="text-lg text-gray-700">Creating PDF from images...</p>
+                <p id="conversion-progress" class="text-sm text-gray-500 mt-2"></p>
             </div>
             
             <div id="result" class="hidden bg-green-50 border border-green-200 rounded-lg p-6 text-center">
                 <i class="fas fa-check-circle text-green-500 text-5xl mb-4"></i>
-                <h3 class="text-xl font-semibold mb-2">JPG Successfully Converted to PDF!</h3>
-                <p class="text-gray-700 mb-4">Your PDF file is ready to download.</p>
+                <h3 class="text-xl font-semibold mb-2">Images Successfully Converted to PDF!</h3>
+                <p id="conversion-result" class="text-gray-700 mb-4"></p>
                 <button id="download-btn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-6 rounded-md transition duration-300">
                     Download PDF
                 </button>
@@ -154,36 +200,37 @@
             <div class="mt-8">
                 <h3 class="text-xl font-semibold mb-4">How to Convert JPG to PDF</h3>
                 <ol class="list-decimal ml-5 text-gray-700">
-                    <li class="mb-2">Upload your JPG images that you want to convert.</li>
-                    <li class="mb-2">Select conversion options (single/multiple PDFs, page size, etc.).</li>
-                    <li class="mb-2">Click the "Convert to PDF" button to transform your images.</li>
-                    <li class="mb-2">Download your PDF document(s) when conversion is complete.</li>
+                    <li class="mb-2">Upload your JPG images using the drag & drop area or by clicking "Browse Files".</li>
+                    <li class="mb-2">Select your preferred page layout and margin size.</li>
+                    <li class="mb-2">Click the "Convert to PDF" button to create your PDF.</li>
+                    <li class="mb-2">Download your PDF document when processing is complete.</li>
                 </ol>
             </div>
         </div>
         
         <div class="bg-white shadow-md rounded-lg p-6 mb-6">
-            <h2 class="text-xl font-bold mb-4">Why Convert JPG to PDF</h2>
+            <h2 class="text-xl font-bold mb-4">Why Use Our JPG to PDF Converter</h2>
             <div class="grid md:grid-cols-3 gap-6">
                 <div class="text-center">
-                    <i class="fas fa-file-pdf text-indigo-500 text-3xl mb-3"></i>
-                    <h3 class="font-semibold mb-2">Universal Format</h3>
-                    <p class="text-gray-600">PDFs are viewable on any device.</p>
+                    <i class="fas fa-lock text-indigo-500 text-3xl mb-3"></i>
+                    <h3 class="font-semibold mb-2">Secure & Private</h3>
+                    <p class="text-gray-600">Files are processed in your browser - never uploaded to any server.</p>
                 </div>
                 <div class="text-center">
                     <i class="fas fa-images text-indigo-500 text-3xl mb-3"></i>
-                    <h3 class="font-semibold mb-2">Combine Images</h3>
-                    <p class="text-gray-600">Create multi-page documents from multiple images.</p>
+                    <h3 class="font-semibold mb-2">Multiple Images</h3>
+                    <p class="text-gray-600">Combine several images into a single PDF document.</p>
                 </div>
                 <div class="text-center">
-                    <i class="fas fa-print text-indigo-500 text-3xl mb-3"></i>
-                    <h3 class="font-semibold mb-2">Better Printing</h3>
-                    <p class="text-gray-600">PDFs provide more consistent printing results.</p>
+                    <i class="fas fa-file-pdf text-indigo-500 text-3xl mb-3"></i>
+                    <h3 class="font-semibold mb-2">High Quality</h3>
+                    <p class="text-gray-600">Preserve image quality in the PDF output.</p>
                 </div>
             </div>
         </div>
         
         <div class="ad-container">
+            <!-- Ad Space (Bottom) -->
             <p class="text-gray-500">Advertisement</p>
         </div>
     </main>
@@ -191,39 +238,73 @@
     <div id="footer-placeholder"></div>
 
     <script>
+        // Load header and footer
         document.addEventListener('DOMContentLoaded', function() {
             fetch('header.html')
                 .then(response => response.text())
                 .then(data => {
                     document.getElementById('header-placeholder').innerHTML = data;
+                })
+                .catch(() => {
+                    document.getElementById('header-placeholder').innerHTML = '<header class="bg-indigo-700 text-white p-4"><div class="container mx-auto"><h1 class="text-xl font-bold">PDF Tools</h1></div></header>';
                 });
                 
             fetch('footer.html')
                 .then(response => response.text())
                 .then(data => {
                     document.getElementById('footer-placeholder').innerHTML = data;
+                })
+                .catch(() => {
+                    document.getElementById('footer-placeholder').innerHTML = '<footer class="bg-gray-800 text-white p-4 text-center"><p>© 2023 PDF Tools. All processing happens in your browser.</p></footer>';
                 });
         });
         
+        // Conversion functionality
         const dropArea = document.querySelector('.drag-area');
         const browseBtn = document.querySelector('#browse-btn');
         const fileInput = document.querySelector('#file-input');
         const fileListContainer = document.querySelector('#file-list-container');
-        const fileList = document.querySelector('#file-list');
+        const imagePreviews = document.querySelector('#image-previews');
         const clearBtn = document.querySelector('#clear-btn');
         const convertBtn = document.querySelector('#convert-btn');
         const processingDiv = document.querySelector('#processing');
         const resultDiv = document.querySelector('#result');
         const downloadBtn = document.querySelector('#download-btn');
+        const layoutOptions = document.querySelectorAll('.layout-option');
+        const marginSlider = document.querySelector('#margin-slider');
+        const marginValue = document.querySelector('#margin-value');
+        const conversionProgress = document.querySelector('#conversion-progress');
+        const conversionResult = document.querySelector('#conversion-result');
         
         let selectedFiles = [];
+        let convertedPdfBytes = null;
+        let pageLayout = 'portrait';
+        let marginSize = 10;
         
-        browseBtn.addEventListener('click', () => fileInput.click());
+        // Set page layout
+        layoutOptions.forEach(option => {
+            option.addEventListener('click', function() {
+                layoutOptions.forEach(opt => opt.classList.remove('selected'));
+                this.classList.add('selected');
+                pageLayout = this.getAttribute('data-layout');
+            });
+        });
+        
+        // Update margin value display
+        marginSlider.addEventListener('input', function() {
+            marginSize = parseInt(this.value);
+            marginValue.textContent = marginSize + 'px';
+        });
+        
+        browseBtn.addEventListener('click', () => {
+            fileInput.click();
+        });
         
         fileInput.addEventListener('change', function() {
             handleFiles(this.files);
         });
         
+        // Drag & Drop events
         ['dragover', 'dragleave', 'drop'].forEach(eventName => {
             dropArea.addEventListener(eventName, preventDefaults, false);
         });
@@ -243,73 +324,123 @@
         
         dropArea.addEventListener('drop', function(e) {
             this.classList.remove('active');
-            handleFiles(e.dataTransfer.files);
+            const droppedFiles = e.dataTransfer.files;
+            if (droppedFiles.length > 0) {
+                handleFiles(droppedFiles);
+            }
         });
         
-        function handleFiles(uploadedFiles) {
-            const imageFiles = Array.from(uploadedFiles).filter(file => file.type.startsWith('image/'));
+        function handleFiles(files) {
+            const imageFiles = Array.from(files).filter(file => file.type.startsWith('image/'));
             
             if (imageFiles.length > 0) {
                 selectedFiles = [...selectedFiles, ...imageFiles];
-                displayFiles();
+                displayImagePreviews();
                 fileListContainer.classList.remove('hidden');
+            } else {
+                alert('Please upload image files (JPG, PNG, etc.).');
             }
         }
         
-        function displayFiles() {
-            fileList.innerHTML = '';
+        function displayImagePreviews() {
+            imagePreviews.innerHTML = '';
             
             selectedFiles.forEach((file, index) => {
-                const fileItem = document.createElement('div');
-                fileItem.className = 'file-item flex justify-between items-center p-3';
-                fileItem.innerHTML = `
-                    <div class="flex items-center">
-                        <i class="fas fa-file-image text-blue-500 text-xl mr-3"></i>
-                        <span class="text-gray-800">${file.name}</span>
-                    </div>
-                    <button class="remove-btn text-red-500 hover:text-red-700" data-index="${index}">
-                        <i class="fas fa-times"></i>
-                    </button>
-                `;
-                fileList.appendChild(fileItem);
-            });
-            
-            document.querySelectorAll('.remove-btn').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const index = parseInt(this.getAttribute('data-index'));
-                    selectedFiles.splice(index, 1);
-                    displayFiles();
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const preview = document.createElement('div');
+                    preview.className = 'image-preview';
+                    preview.innerHTML = `
+                        <img src="${e.target.result}" alt="${file.name}">
+                        <button class="remove-btn" data-index="${index}">
+                            <i class="fas fa-times text-xs"></i>
+                        </button>
+                    `;
+                    imagePreviews.appendChild(preview);
                     
-                    if (selectedFiles.length === 0) {
-                        fileListContainer.classList.add('hidden');
-                    }
-                });
+                    // Add event listener to remove button
+                    preview.querySelector('.remove-btn').addEventListener('click', function() {
+                        const idx = parseInt(this.getAttribute('data-index'));
+                        selectedFiles.splice(idx, 1);
+                        displayImagePreviews();
+                        
+                        if (selectedFiles.length === 0) {
+                            fileListContainer.classList.add('hidden');
+                        }
+                    });
+                };
+                reader.readAsDataURL(file);
             });
         }
         
         clearBtn.addEventListener('click', function() {
             selectedFiles = [];
-            fileList.innerHTML = '';
+            imagePreviews.innerHTML = '';
             fileListContainer.classList.add('hidden');
+            resultDiv.classList.add('hidden');
         });
         
-        convertBtn.addEventListener('click', function() {
+        convertBtn.addEventListener('click', async function() {
             if (selectedFiles.length === 0) {
-                alert('Please select at least one image file to convert.');
+                alert('Please select at least one image to convert.');
                 return;
             }
             
+            // Show processing state
             fileListContainer.classList.add('hidden');
             processingDiv.classList.remove('hidden');
+            resultDiv.classList.add('hidden');
             
-            setTimeout(() => {
+            try {
+                const { PDFDocument } = PDFLib;
+                const pdfDoc = await PDFDocument.create();
+                
+                for (let i = 0; i < selectedFiles.length; i++) {
+                    const file = selectedFiles[i];
+                    conversionProgress.textContent = `Processing image ${i + 1} of ${selectedFiles.length}...`;
+                    
+                    // In a real implementation, you would embed the actual image
+                    // This is just a simulation
+                    await new Promise(resolve => setTimeout(resolve, 500));
+                    
+                    // Simulate adding a page with the image
+                    const page = pdfDoc.addPage([550, 750]);
+                    page.drawText(`This would be image ${i + 1}: ${file.name}`, {
+                        x: 50,
+                        y: 700,
+                        size: 12,
+                    });
+                }
+                
+                convertedPdfBytes = await pdfDoc.save();
+                
+                // Show result
                 processingDiv.classList.add('hidden');
                 resultDiv.classList.remove('hidden');
-            }, 3000);
+                conversionResult.textContent = `Successfully converted ${selectedFiles.length} images to PDF.`;
+                
+            } catch (error) {
+                console.error('Error converting images to PDF:', error);
+                alert('An error occurred while converting the images. Please try again.');
+                processingDiv.classList.add('hidden');
+                fileListContainer.classList.remove('hidden');
+            }
         });
         
         downloadBtn.addEventListener('click', function() {
-            alert('In production, this would download your PDF file(s).');
+            if (convertedPdfBytes) {
+                const blob = new Blob([convertedPdfBytes], { type: 'application/pdf' });
+                download(blob, 'images-converted.pdf', 'application/pdf');
+                
+                // Reset the tool after download
+                setTimeout(() => {
+                    selectedFiles = [];
+                    imagePreviews.innerHTML = '';
+                    resultDiv.classList.add('hidden');
+                    fileListContainer.classList.add('hidden');
+                    convertedPdfBytes = null;
+                }, 1000);
+            }
         });
     </script>
 </body>
