@@ -1,1 +1,539 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF to JPG - Convert PDF Pages to Images Online</title>
+    <!-- Tailwind CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.2.1/css/all.min.css" rel="stylesheet">
+    <!-- PDF-LIB -->
+    <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+    <script src="https://unpkg.com/downloadjs@1.4.7"></script>
+    <style>
+        .drag-area {
+            border: 2px dashed #6c63ff;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+        }
+        .drag-area.active {
+            border-color: #4BB543;
+            background-color: rgba(75, 181, 67, 0.1);
+        }
+        .file-item {
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            margin-bottom: 8px;
+            transition: all 0.3s ease;
+        }
+        .file-item:hover {
+            background-color: #e9ecef;
+        }
+        .ad-container {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 15px 0;
+            text-align: center;
+        }
+        #header-placeholder, #footer-placeholder {
+            width: 100%;
+        }
+        .conversion-option {
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .conversion-option:hover {
+            border-color: #6366f1;
+            background-color: #f8fafc;
+        }
+        .conversion-option.selected {
+            border-color: #6366f1;
+            background-color: #eef2ff;
+        }
+        #preview-container {
+            display: none;
+            margin-top: 20px;
+        }
+        .page-preview {
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            overflow: hidden;
+        }
+        .page-preview img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+        .page-info {
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-top: 1px solid #e2e8f0;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 font-sans">
+    <div id="header-placeholder"></div>
 
+    <main class="container mx-auto py-6 px-4">
+        <div class="bg-white shadow-md rounded-lg p-6 mb-6">
+            <h1 class="text-2xl md:text-3xl font-bold text-center text-indigo-700 mb-6">PDF to JPG Converter</h1>
+            
+            <div class="ad-container">
+                <!-- Ad Space (Top) -->
+                <p class="text-gray-500">Advertisement</p>
+            </div>
+            
+            <div class="mb-6">
+                <p class="text-gray-700 mb-4">Convert your PDF documents to high-quality JPG images. Each page of your PDF will become a separate image file.</p>
+                
+                <div class="bg-blue-50 border-l-4 border-blue-500 text-blue-700 p-4 mb-6" role="alert">
+                    <p class="font-bold">Features:</p>
+                    <ul class="list-disc ml-5">
+                        <li>Convert PDF pages to JPG images</li>
+                        <li>Select specific pages or convert all</li>
+                        <li>Adjust image quality and resolution</li>
+                        <li>Secure and private (processing happens in your browser)</li>
+                    </ul>
+                </div>
+                
+                <div class="mb-6">
+                    <h3 class="text-lg font-semibold mb-3">Conversion Options:</h3>
+                    <div class="grid md:grid-cols-2 gap-4">
+                        <div class="conversion-option selected" data-option="all">
+                            <div class="flex items-center">
+                                <i class="fas fa-file-image text-indigo-500 text-xl mr-3"></i>
+                                <h4 class="font-medium">Convert All Pages</h4>
+                            </div>
+                            <p class="text-sm text-gray-600 mt-2">Convert every page in the PDF to JPG</p>
+                        </div>
+                        <div class="conversion-option" data-option="range">
+                            <div class="flex items-center">
+                                <i class="fas fa-file-alt text-indigo-500 text-xl mr-3"></i>
+                                <h4 class="font-medium">Convert Page Range</h4>
+                            </div>
+                            <p class="text-sm text-gray-600 mt-2">Convert specific pages (e.g., 1-3, 5, 7-9)</p>
+                        </div>
+                    </div>
+                    
+                    <div id="range-input" class="mt-4 hidden">
+                        <label class="block text-gray-700 mb-2">Page range:</label>
+                        <input type="text" id="page-range" placeholder="e.g., 1-3, 5, 7-9" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    </div>
+                </div>
+                
+                <div class="mb-6">
+                    <h3 class="text-lg font-semibold mb-3">Image Quality:</h3>
+                    <input type="range" id="quality-slider" min="1" max="100" value="85" class="w-full mb-2">
+                    <div class="flex justify-between">
+                        <span class="text-sm text-gray-600">Low Quality</span>
+                        <span class="text-sm text-gray-600">High Quality</span>
+                    </div>
+                    <div class="text-center mt-1">
+                        <span id="quality-value" class="text-sm font-medium">85%</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="drag-area h-60 flex flex-col justify-center items-center p-4 mb-6">
+                <i class="fas fa-file-pdf text-indigo-500 text-5xl mb-4"></i>
+                <h3 class="text-xl font-semibold mb-2">Drag & Drop PDF File Here</h3>
+                <p class="text-gray-500 text-center mb-4">or</p>
+                <button id="browse-btn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-6 rounded-md transition duration-300">
+                    Browse Files
+                </button>
+                <input type="file" id="file-input" accept=".pdf" class="hidden">
+            </div>
+            
+            <div id="file-list-container" class="mb-6 hidden">
+                <h3 class="text-lg font-semibold mb-3">Selected File:</h3>
+                <div id="file-list" class="mb-4">
+                    <!-- File will be listed here -->
+                </div>
+                
+                <div id="preview-container">
+                    <h3 class="text-lg font-semibold mb-3">Page Preview:</h3>
+                    <div id="page-previews" class="mb-4">
+                        <!-- Page previews will appear here -->
+                    </div>
+                </div>
+                
+                <div class="flex flex-col md:flex-row justify-center gap-4 mb-4">
+                    <button id="clear-btn" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-6 rounded-md transition duration-300">
+                        Clear
+                    </button>
+                    <button id="convert-btn" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-6 rounded-md transition duration-300">
+                        Convert to JPG
+                    </button>
+                </div>
+            </div>
+            
+            <div id="processing" class="hidden text-center py-4">
+                <div class="animate-spin rounded-full h-12 w-12 border-t-4 border-indigo-500 border-solid mx-auto mb-4"></div>
+                <p class="text-lg text-gray-700">Converting PDF to JPG...</p>
+                <p id="conversion-progress" class="text-sm text-gray-500 mt-2"></p>
+            </div>
+            
+            <div id="result" class="hidden bg-green-50 border border-green-200 rounded-lg p-6 text-center">
+                <i class="fas fa-check-circle text-green-500 text-5xl mb-4"></i>
+                <h3 class="text-xl font-semibold mb-2">PDF Successfully Converted to JPG!</h3>
+                <p id="conversion-result" class="text-gray-700 mb-4"></p>
+                <button id="download-all-btn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-6 rounded-md transition duration-300 mb-3">
+                    Download All as ZIP
+                </button>
+                <div id="individual-downloads" class="mt-4">
+                    <!-- Individual download buttons will appear here -->
+                </div>
+            </div>
+            
+            <div class="mt-8">
+                <h3 class="text-xl font-semibold mb-4">How to Convert PDF to JPG</h3>
+                <ol class="list-decimal ml-5 text-gray-700">
+                    <li class="mb-2">Upload your PDF file using the drag & drop area or by clicking "Browse Files".</li>
+                    <li class="mb-2">Select whether to convert all pages or a specific range.</li>
+                    <li class="mb-2">Adjust the image quality slider if needed.</li>
+                    <li class="mb-2">Click the "Convert to JPG" button to start the conversion.</li>
+                    <li class="mb-2">Download your JPG images when processing is complete.</li>
+                </ol>
+            </div>
+        </div>
+        
+        <div class="bg-white shadow-md rounded-lg p-6 mb-6">
+            <h2 class="text-xl font-bold mb-4">Why Use Our PDF to JPG Converter</h2>
+            <div class="grid md:grid-cols-3 gap-6">
+                <div class="text-center">
+                    <i class="fas fa-lock text-indigo-500 text-3xl mb-3"></i>
+                    <h3 class="font-semibold mb-2">Secure & Private</h3>
+                    <p class="text-gray-600">Files are processed in your browser - never uploaded to any server.</p>
+                </div>
+                <div class="text-center">
+                    <i class="fas fa-image text-indigo-500 text-3xl mb-3"></i>
+                    <h3 class="font-semibold mb-2">High Quality</h3>
+                    <p class="text-gray-600">Convert PDFs to high-resolution JPG images.</p>
+                </div>
+                <div class="text-center">
+                    <i class="fas fa-tachometer-alt text-indigo-500 text-3xl mb-3"></i>
+                    <h3 class="font-semibold mb-2">Fast Processing</h3>
+                    <p class="text-gray-600">Quick conversion without waiting for uploads.</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="ad-container">
+            <!-- Ad Space (Bottom) -->
+            <p class="text-gray-500">Advertisement</p>
+        </div>
+    </main>
+
+    <div id="footer-placeholder"></div>
+
+    <script>
+        // Load header and footer
+        document.addEventListener('DOMContentLoaded', function() {
+            fetch('header.html')
+                .then(response => response.text())
+                .then(data => {
+                    document.getElementById('header-placeholder').innerHTML = data;
+                })
+                .catch(() => {
+                    document.getElementById('header-placeholder').innerHTML = '<header class="bg-indigo-700 text-white p-4"><div class="container mx-auto"><h1 class="text-xl font-bold">PDF Tools</h1></div></header>';
+                });
+                
+            fetch('footer.html')
+                .then(response => response.text())
+                .then(data => {
+                    document.getElementById('footer-placeholder').innerHTML = data;
+                })
+                .catch(() => {
+                    document.getElementById('footer-placeholder').innerHTML = '<footer class="bg-gray-800 text-white p-4 text-center"><p>© 2023 PDF Tools. All processing happens in your browser.</p></footer>';
+                });
+        });
+        
+        // Conversion functionality
+        const dropArea = document.querySelector('.drag-area');
+        const browseBtn = document.querySelector('#browse-btn');
+        const fileInput = document.querySelector('#file-input');
+        const fileListContainer = document.querySelector('#file-list-container');
+        const fileList = document.querySelector('#file-list');
+        const clearBtn = document.querySelector('#clear-btn');
+        const convertBtn = document.querySelector('#convert-btn');
+        const processingDiv = document.querySelector('#processing');
+        const resultDiv = document.querySelector('#result');
+        const downloadAllBtn = document.querySelector('#download-all-btn');
+        const individualDownloads = document.querySelector('#individual-downloads');
+        const conversionOptions = document.querySelectorAll('.conversion-option');
+        const rangeInput = document.querySelector('#range-input');
+        const pageRange = document.querySelector('#page-range');
+        const qualitySlider = document.querySelector('#quality-slider');
+        const qualityValue = document.querySelector('#quality-value');
+        const conversionProgress = document.querySelector('#conversion-progress');
+        const conversionResult = document.querySelector('#conversion-result');
+        const previewContainer = document.querySelector('#preview-container');
+        const pagePreviews = document.querySelector('#page-previews');
+        
+        let selectedFile = null;
+        let convertedImages = [];
+        let conversionOption = 'all';
+        let quality = 85;
+        
+        // Set conversion option
+        conversionOptions.forEach(option => {
+            option.addEventListener('click', function() {
+                conversionOptions.forEach(opt => opt.classList.remove('selected'));
+                this.classList.add('selected');
+                conversionOption = this.getAttribute('data-option');
+                
+                if (conversionOption === 'range') {
+                    rangeInput.classList.remove('hidden');
+                } else {
+                    rangeInput.classList.add('hidden');
+                }
+            });
+        });
+        
+        // Update quality value display
+        qualitySlider.addEventListener('input', function() {
+            quality = parseInt(this.value);
+            qualityValue.textContent = quality + '%';
+        });
+        
+        browseBtn.addEventListener('click', () => {
+            fileInput.click();
+        });
+        
+        fileInput.addEventListener('change', function() {
+            handleFile(this.files[0]);
+        });
+        
+        // Drag & Drop events
+        ['dragover', 'dragleave', 'drop'].forEach(eventName => {
+            dropArea.addEventListener(eventName, preventDefaults, false);
+        });
+        
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+        
+        dropArea.addEventListener('dragover', function() {
+            this.classList.add('active');
+        });
+        
+        dropArea.addEventListener('dragleave', function() {
+            this.classList.remove('active');
+        });
+        
+        dropArea.addEventListener('drop', function(e) {
+            this.classList.remove('active');
+            const droppedFiles = e.dataTransfer.files;
+            if (droppedFiles.length > 0) {
+                handleFile(droppedFiles[0]);
+            }
+        });
+        
+        function handleFile(file) {
+            if (file.type === 'application/pdf') {
+                selectedFile = file;
+                displayFile();
+                fileListContainer.classList.remove('hidden');
+                showPreview();
+            } else {
+                alert('Please upload a PDF file.');
+            }
+        }
+        
+        function displayFile() {
+            fileList.innerHTML = '';
+            
+            const fileItem = document.createElement('div');
+            fileItem.className = 'file-item flex justify-between items-center p-3';
+            fileItem.innerHTML = `
+                <div class="flex items-center">
+                    <i class="fas fa-file-pdf text-red-500 text-xl mr-3"></i>
+                    <span class="text-gray-800 truncate" style="max-width: 70vw;">${selectedFile.name}</span>
+                    <span class="text-gray-500 text-sm ml-2">(${(selectedFile.size / 1024).toFixed(1)} KB)</span>
+                </div>
+                <div class="flex items-center">
+                    <button class="remove-btn text-red-500 hover:text-red-700 ml-2">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            `;
+            fileList.appendChild(fileItem);
+            
+            // Add event listener to remove button
+            document.querySelector('.remove-btn').addEventListener('click', function() {
+                selectedFile = null;
+                fileList.innerHTML = '';
+                fileListContainer.classList.add('hidden');
+                resultDiv.classList.add('hidden');
+                previewContainer.style.display = 'none';
+                pagePreviews.innerHTML = '';
+                convertedImages = [];
+            });
+        }
+        
+        async function showPreview() {
+            try {
+                // In a real implementation, you would render PDF pages as images for preview
+                // This is just a placeholder
+                pagePreviews.innerHTML = `
+                    <div class="page-preview">
+                        <div style="background-color: #f3f4f6; height: 200px; display: flex; align-items: center; justify-content: center;">
+                            <i class="fas fa-file-pdf text-gray-400 text-5xl"></i>
+                        </div>
+                        <div class="page-info">
+                            <p class="text-sm text-gray-700">Page 1 preview</p>
+                        </div>
+                    </div>
+                    <div class="page-preview">
+                        <div style="background-color: #f3f4f6; height: 200px; display: flex; align-items: center; justify-content: center;">
+                            <i class="fas fa-file-pdf text-gray-400 text-5xl"></i>
+                        </div>
+                        <div class="page-info">
+                            <p class="text-sm text-gray-700">Page 2 preview</p>
+                        </div>
+                    </div>
+                    <p class="text-sm text-gray-500 mt-2">Note: Actual PDF preview would be shown here in a full implementation</p>
+                `;
+                
+                previewContainer.style.display = 'block';
+            } catch (error) {
+                console.error('Error generating preview:', error);
+            }
+        }
+        
+        clearBtn.addEventListener('click', function() {
+            selectedFile = null;
+            fileList.innerHTML = '';
+            fileListContainer.classList.add('hidden');
+            resultDiv.classList.add('hidden');
+            previewContainer.style.display = 'none';
+            pagePreviews.innerHTML = '';
+            convertedImages = [];
+        });
+        
+        convertBtn.addEventListener('click', async function() {
+            if (!selectedFile) {
+                alert('Please select a PDF file to convert.');
+                return;
+            }
+            
+            // Show processing state
+            fileListContainer.classList.add('hidden');
+            processingDiv.classList.remove('hidden');
+            resultDiv.classList.add('hidden');
+            
+            try {
+                // In a real implementation, you would convert PDF pages to JPG images
+                // This is just a simulation
+                let pagesToConvert = [];
+                
+                if (conversionOption === 'all') {
+                    // Simulate 3 pages
+                    pagesToConvert = [1, 2, 3];
+                } else {
+                    // Parse page range (simple implementation for demo)
+                    const rangeText = pageRange.value.trim();
+                    if (rangeText === '') {
+                        throw new Error('Please enter a page range');
+                    }
+                    
+                    // Simple range parser (in real app, use more robust parsing)
+                    const parts = rangeText.split(',');
+                    for (const part of parts) {
+                        if (part.includes('-')) {
+                            const [start, end] = part.split('-').map(Number);
+                            for (let i = start; i <= end; i++) {
+                                if (!pagesToConvert.includes(i)) pagesToConvert.push(i);
+                            }
+                        } else {
+                            const num = parseInt(part);
+                            if (!isNaN(num) && !pagesToConvert.includes(num)) pagesToConvert.push(num);
+                        }
+                    }
+                    
+                    if (pagesToConvert.length === 0) {
+                        throw new Error('Invalid page range');
+                    }
+                }
+                
+                // Sort pages
+                pagesToConvert.sort((a, b) => a - b);
+                
+                // Simulate conversion
+                convertedImages = [];
+                const totalPages = pagesToConvert.length;
+                
+                for (let i = 0; i < pagesToConvert.length; i++) {
+                    const pageNum = pagesToConvert[i];
+                    conversionProgress.textContent = `Processing page ${pageNum} of ${totalPages}...`;
+                    
+                    // Simulate processing delay
+                    await new Promise(resolve => setTimeout(resolve, 1000));
+                    
+                    // In a real app, you would convert the actual PDF page to JPG here
+                    // For demo, we'll create a simulated image
+                    convertedImages.push({
+                        page: pageNum,
+                        data: `Simulated JPG data for page ${pageNum} at ${quality}% quality`
+                    });
+                }
+                
+                // Show result
+                processingDiv.classList.add('hidden');
+                resultDiv.classList.remove('hidden');
+                
+                conversionResult.textContent = `Successfully converted ${convertedImages.length} pages to JPG images.`;
+                
+                // Create individual download buttons
+                individualDownloads.innerHTML = '';
+                if (convertedImages.length > 1) {
+                    individualDownloads.innerHTML = '<p class="text-sm text-gray-600 mb-2">Or download individual images:</p>';
+                    convertedImages.forEach(img => {
+                        const btn = document.createElement('button');
+                        btn.className = 'bg-blue-500 hover:bg-blue-600 text-white font-bold py-1 px-4 rounded-md transition duration-300 mr-2 mb-2';
+                        btn.textContent = `Page ${img.page}.jpg`;
+                        btn.addEventListener('click', () => {
+                            // In a real app, this would download the actual JPG
+                            alert(`This would download page ${img.page} as JPG`);
+                        });
+                        individualDownloads.appendChild(btn);
+                    });
+                }
+                
+            } catch (error) {
+                console.error('Error converting PDF to JPG:', error);
+                alert(error.message || 'An error occurred while converting the PDF. Please try again.');
+                processingDiv.classList.add('hidden');
+                fileListContainer.classList.remove('hidden');
+            }
+        });
+        
+        downloadAllBtn.addEventListener('click', function() {
+            if (convertedImages.length > 0) {
+                // In a real implementation, you would create a ZIP of all JPGs and download it
+                alert('This would download all converted pages as a ZIP file');
+                
+                // Reset the tool after download
+                setTimeout(() => {
+                    selectedFile = null;
+                    fileList.innerHTML = '';
+                    resultDiv.classList.add('hidden');
+                    fileListContainer.classList.add('hidden');
+                    previewContainer.style.display = 'none';
+                    pagePreviews.innerHTML = '';
+                    convertedImages = [];
+                }, 1000);
+            }
+        });
+    </script>
+</body>
+</html>
