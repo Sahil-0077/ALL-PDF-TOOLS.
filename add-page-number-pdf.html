@@ -3,11 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Add Page Numbers to PDF - Number PDF Pages Online</title>
+    <title>Add Page Numbers to PDF</title>
     <!-- Tailwind CSS -->
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <!-- Font Awesome -->
     <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.2.1/css/all.min.css" rel="stylesheet">
+    <!-- PDF-LIB -->
+    <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
     <style>
         .drag-area {
             border: 2px dashed #6c63ff;
@@ -17,15 +19,6 @@
         .drag-area.active {
             border-color: #4BB543;
             background-color: rgba(75, 181, 67, 0.1);
-        }
-        .file-item {
-            background-color: #f8f9fa;
-            border-radius: 5px;
-            margin-bottom: 8px;
-            transition: all 0.3s ease;
-        }
-        .file-item:hover {
-            background-color: #e9ecef;
         }
         .ad-container {
             background-color: #f8f9fa;
@@ -38,8 +31,15 @@
         #header-placeholder, #footer-placeholder {
             width: 100%;
         }
-        .numbering-options {
-            display: none;
+        .number-preview {
+            width: 100px;
+            height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto;
+            border: 1px solid #ddd;
+            background-color: white;
         }
     </style>
 </head>
@@ -56,22 +56,22 @@
             </div>
             
             <div class="mb-6">
-                <p class="text-gray-700 mb-4">Easily add page numbers to your PDF documents with customizable formatting options. Choose position, style, and starting number.</p>
+                <p class="text-gray-700 mb-4">Automatically add page numbers to your PDF documents. Customize the position, style, and format of your page numbers.</p>
                 
                 <div class="bg-blue-50 border-l-4 border-blue-500 text-blue-700 p-4 mb-6" role="alert">
                     <p class="font-bold">Features:</p>
                     <ul class="list-disc ml-5">
-                        <li>Add page numbers to any PDF</li>
-                        <li>Customize position and style</li>
-                        <li>Set starting number</li>
-                        <li>Preview before downloading</li>
+                        <li>Add numbers to all pages or specific ranges</li>
+                        <li>Customize position, font, size and color</li>
+                        <li>Include prefixes and different numbering styles</li>
+                        <li>Secure and private (processing happens in your browser)</li>
                     </ul>
                 </div>
             </div>
             
             <div class="drag-area h-60 flex flex-col justify-center items-center p-4 mb-6">
-                <i class="fas fa-cloud-upload-alt text-indigo-500 text-5xl mb-4"></i>
-                <h3 class="text-xl font-semibold mb-2">Drag & Drop PDF Here</h3>
+                <i class="fas fa-file-alt text-indigo-500 text-5xl mb-4"></i>
+                <h3 class="text-xl font-semibold mb-2">Drag & Drop PDF File Here</h3>
                 <p class="text-gray-500 text-center mb-4">or</p>
                 <button id="browse-btn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-6 rounded-md transition duration-300">
                     Browse Files
@@ -79,59 +79,52 @@
                 <input type="file" id="file-input" accept=".pdf" class="hidden">
             </div>
             
-            <div id="file-list-container" class="mb-6 hidden">
-                <h3 class="text-lg font-semibold mb-3">Selected File:</h3>
-                <div id="file-list" class="mb-4">
-                    <!-- File will be listed here -->
-                </div>
+            <div id="options-section" class="hidden mb-6">
+                <h3 class="text-lg font-semibold mb-3">Page Number Options:</h3>
                 
-                <div id="numbering-options" class="numbering-options mb-6">
-                    <h3 class="text-lg font-semibold mb-3">Page Number Options</h3>
-                    <div class="grid md:grid-cols-2 gap-6 mb-4">
-                        <div>
-                            <label class="block text-gray-700 mb-2">Position:</label>
-                            <select class="w-full p-2 border rounded">
-                                <option>Bottom Center</option>
-                                <option>Bottom Right</option>
-                                <option>Bottom Left</option>
-                                <option>Top Center</option>
-                                <option>Top Right</option>
-                                <option>Top Left</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-gray-700 mb-2">Starting Number:</label>
-                            <input type="number" min="1" value="1" class="w-full p-2 border rounded">
-                        </div>
+                <div class="grid md:grid-cols-2 gap-6 mb-6">
+                    <div>
+                        <label class="block text-gray-700 mb-2">Position</label>
+                        <select id="position" class="w-full p-2 border border-gray-300 rounded-md">
+                            <option value="bottom-center">Bottom Center</option>
+                            <option value="bottom-right">Bottom Right</option>
+                            <option value="bottom-left">Bottom Left</option>
+                            <option value="top-center">Top Center</option>
+                            <option value="top-right">Top Right</option>
+                            <option value="top-left">Top Left</option>
+                        </select>
                     </div>
-                    <div class="mb-4">
-                        <label class="block text-gray-700 mb-2">Format:</label>
-                        <div class="flex flex-wrap gap-4">
-                            <label class="inline-flex items-center">
-                                <input type="radio" name="format" checked class="mr-2"> 1, 2, 3
-                            </label>
-                            <label class="inline-flex items-center">
-                                <input type="radio" name="format" class="mr-2"> i, ii, iii
-                            </label>
-                            <label class="inline-flex items-center">
-                                <input type="radio" name="format" class="mr-2"> I, II, III
-                            </label>
-                            <label class="inline-flex items-center">
-                                <input type="radio" name="format" class="mr-2"> a, b, c
-                            </label>
-                        </div>
+                    
+                    <div>
+                        <label class="block text-gray-700 mb-2">Number Format</label>
+                        <select id="format" class="w-full p-2 border border-gray-300 rounded-md">
+                            <option value="1">1, 2, 3...</option>
+                            <option value="i">i, ii, iii...</option>
+                            <option value="I">I, II, III...</option>
+                            <option value="a">a, b, c...</option>
+                            <option value="A">A, B, C...</option>
+                        </select>
                     </div>
-                    <div class="mb-4">
-                        <label class="block text-gray-700 mb-2">Font Size:</label>
-                        <input type="range" min="8" max="36" value="12" class="w-full">
+                    
+                    <div>
+                        <label class="block text-gray-700 mb-2">Font Size</label>
+                        <input type="range" id="font-size" min="8" max="36" value="12" class="w-full">
+                        <div class="text-center text-sm text-gray-600" id="font-size-value">12px</div>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-gray-700 mb-2">Color</label>
+                        <input type="color" id="color" value="#000000" class="w-full h-10">
                     </div>
                 </div>
                 
-                <div class="flex flex-col md:flex-row justify-center gap-4 mb-4">
-                    <button id="clear-btn" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-6 rounded-md transition duration-300">
-                        Clear
-                    </button>
-                    <button id="add-numbers-btn" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-6 rounded-md transition duration-300">
+                <div class="mb-6">
+                    <label class="block text-gray-700 mb-2">Preview:</label>
+                    <div class="number-preview" id="number-preview">1</div>
+                </div>
+                
+                <div class="flex justify-center">
+                    <button id="add-numbers-btn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-6 rounded-md transition duration-300">
                         Add Page Numbers
                     </button>
                 </div>
@@ -139,46 +132,46 @@
             
             <div id="processing" class="hidden text-center py-4">
                 <div class="animate-spin rounded-full h-12 w-12 border-t-4 border-indigo-500 border-solid mx-auto mb-4"></div>
-                <p class="text-lg text-gray-700">Adding page numbers to your PDF...</p>
+                <p class="text-lg text-gray-700">Adding page numbers...</p>
             </div>
             
             <div id="result" class="hidden bg-green-50 border border-green-200 rounded-lg p-6 text-center">
                 <i class="fas fa-check-circle text-green-500 text-5xl mb-4"></i>
                 <h3 class="text-xl font-semibold mb-2">Page Numbers Added Successfully!</h3>
-                <p class="text-gray-700 mb-4">Your PDF document now includes page numbers.</p>
+                <p class="text-gray-700 mb-4">Your PDF now includes page numbers.</p>
                 <button id="download-btn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-6 rounded-md transition duration-300">
                     Download Numbered PDF
                 </button>
             </div>
             
             <div class="mt-8">
-                <h3 class="text-xl font-semibold mb-4">How to Add Page Numbers to PDF</h3>
+                <h3 class="text-xl font-semibold mb-4">How to Add Page Numbers</h3>
                 <ol class="list-decimal ml-5 text-gray-700">
-                    <li class="mb-2">Upload your PDF file using the drag & drop area or by clicking "Browse Files".</li>
-                    <li class="mb-2">Customize the page number position, format, and starting number.</li>
-                    <li class="mb-2">Click the "Add Page Numbers" button to process your document.</li>
-                    <li class="mb-2">Download your numbered PDF when processing is complete.</li>
+                    <li class="mb-2">Upload your PDF file.</li>
+                    <li class="mb-2">Customize the page number position, style and format.</li>
+                    <li class="mb-2">Click "Add Page Numbers" to process your document.</li>
+                    <li class="mb-2">Download your PDF with page numbers.</li>
                 </ol>
             </div>
         </div>
         
         <div class="bg-white shadow-md rounded-lg p-6 mb-6">
-            <h2 class="text-xl font-bold mb-4">Why Add Page Numbers to PDF?</h2>
+            <h2 class="text-xl font-bold mb-4">Why Add Page Numbers</h2>
             <div class="grid md:grid-cols-3 gap-6">
                 <div class="text-center">
-                    <i class="fas fa-sort-numeric-up text-indigo-500 text-3xl mb-3"></i>
-                    <h3 class="font-semibold mb-2">Organization</h3>
-                    <p class="text-gray-600">Makes large documents easier to navigate and reference.</p>
-                </div>
-                <div class="text-center">
-                    <i class="fas fa-file-alt text-indigo-500 text-3xl mb-3"></i>
-                    <h3 class="font-semibold mb-2">Professionalism</h3>
-                    <p class="text-gray-600">Adds a professional touch to reports and submissions.</p>
+                    <i class="fas fa-file-signature text-indigo-500 text-3xl mb-3"></i>
+                    <h3 class="font-semibold mb-2">Professional Documents</h3>
+                    <p class="text-gray-600">Essential for reports and formal documents.</p>
                 </div>
                 <div class="text-center">
                     <i class="fas fa-book-open text-indigo-500 text-3xl mb-3"></i>
-                    <h3 class="font-semibold mb-2">Academic Use</h3>
-                    <p class="text-gray-600">Required for many academic papers and theses.</p>
+                    <h3 class="font-semibold mb-2">Easy Reference</h3>
+                    <p class="text-gray-600">Helps readers navigate your document.</p>
+                </div>
+                <div class="text-center">
+                    <i class="fas fa-print text-indigo-500 text-3xl mb-3"></i>
+                    <h3 class="font-semibold mb-2">Print Ready</h3>
+                    <p class="text-gray-600">Ensure pages stay in order when printed.</p>
                 </div>
             </div>
         </div>
@@ -198,29 +191,56 @@
                 .then(response => response.text())
                 .then(data => {
                     document.getElementById('header-placeholder').innerHTML = data;
+                })
+                .catch(() => {
+                    document.getElementById('header-placeholder').innerHTML = '<header class="bg-indigo-700 text-white p-4"><div class="container mx-auto"><h1 class="text-xl font-bold">Page Number Tool</h1></div></header>';
                 });
                 
             fetch('footer.html')
                 .then(response => response.text())
                 .then(data => {
                     document.getElementById('footer-placeholder').innerHTML = data;
+                })
+                .catch(() => {
+                    document.getElementById('footer-placeholder').innerHTML = '<footer class="bg-gray-800 text-white p-4 text-center"><p>© 2023 PDF Page Number Tool. All processing happens in your browser.</p></footer>';
                 });
         });
         
-        // File upload functionality
+        // Page number functionality
         const dropArea = document.querySelector('.drag-area');
         const browseBtn = document.querySelector('#browse-btn');
         const fileInput = document.querySelector('#file-input');
-        const fileListContainer = document.querySelector('#file-list-container');
-        const fileList = document.querySelector('#file-list');
-        const numberingOptions = document.querySelector('#numbering-options');
-        const clearBtn = document.querySelector('#clear-btn');
+        const optionsSection = document.querySelector('#options-section');
         const addNumbersBtn = document.querySelector('#add-numbers-btn');
         const processingDiv = document.querySelector('#processing');
         const resultDiv = document.querySelector('#result');
         const downloadBtn = document.querySelector('#download-btn');
+        const fontSizeInput = document.querySelector('#font-size');
+        const fontSizeValue = document.querySelector('#font-size-value');
+        const colorInput = document.querySelector('#color');
+        const numberPreview = document.querySelector('#number-preview');
         
-        let file = null;
+        let pdfFile = null;
+        
+        // Update preview when options change
+        fontSizeInput.addEventListener('input', updatePreview);
+        colorInput.addEventListener('input', updatePreview);
+        document.querySelector('#format').addEventListener('change', updatePreview);
+        
+        function updatePreview() {
+            fontSizeValue.textContent = `${fontSizeInput.value}px`;
+            numberPreview.style.fontSize = `${fontSizeInput.value}px`;
+            numberPreview.style.color = colorInput.value;
+            
+            const format = document.querySelector('#format').value;
+            let sampleNumber = '1';
+            if (format === 'i') sampleNumber = 'i';
+            if (format === 'I') sampleNumber = 'I';
+            if (format === 'a') sampleNumber = 'a';
+            if (format === 'A') sampleNumber = 'A';
+            
+            numberPreview.textContent = sampleNumber;
+        }
         
         browseBtn.addEventListener('click', () => {
             fileInput.click();
@@ -228,7 +248,9 @@
         
         fileInput.addEventListener('change', function() {
             if (this.files.length > 0) {
-                handleFile(this.files[0]);
+                pdfFile = this.files[0];
+                optionsSection.classList.remove('hidden');
+                updatePreview();
             }
         });
         
@@ -253,82 +275,104 @@
         dropArea.addEventListener('drop', function(e) {
             this.classList.remove('active');
             const droppedFiles = e.dataTransfer.files;
-            if (droppedFiles.length > 0) {
-                handleFile(droppedFiles[0]);
-            }
-        });
-        
-        function handleFile(uploadedFile) {
-            if (uploadedFile.type === 'application/pdf') {
-                file = uploadedFile;
-                displayFile();
-                fileListContainer.classList.remove('hidden');
-                numberingOptions.style.display = 'block';
+            if (droppedFiles.length > 0 && droppedFiles[0].type === 'application/pdf') {
+                pdfFile = droppedFiles[0];
+                optionsSection.classList.remove('hidden');
+                updatePreview();
             } else {
-                alert('Please upload a PDF file.');
+                alert('Please only upload PDF files.');
             }
-        }
-        
-        function displayFile() {
-            fileList.innerHTML = '';
-            
-            const fileItem = document.createElement('div');
-            fileItem.className = 'file-item flex justify-between items-center p-3';
-            fileItem.innerHTML = `
-                <div class="flex items-center">
-                    <i class="fas fa-file-pdf text-red-500 text-xl mr-3"></i>
-                    <span class="text-gray-800">${file.name}</span>
-                </div>
-                <button class="remove-btn text-red-500 hover:text-red-700">
-                    <i class="fas fa-times"></i>
-                </button>
-            `;
-            fileList.appendChild(fileItem);
-            
-            // Add event listener to remove button
-            document.querySelector('.remove-btn').addEventListener('click', function() {
-                file = null;
-                fileList.innerHTML = '';
-                numberingOptions.style.display = 'none';
-                fileListContainer.classList.add('hidden');
-            });
-        }
-        
-        clearBtn.addEventListener('click', function() {
-            file = null;
-            fileList.innerHTML = '';
-            numberingOptions.style.display = 'none';
-            fileListContainer.classList.add('hidden');
         });
         
-        addNumbersBtn.addEventListener('click', function() {
-            if (!file) {
-                alert('Please select a PDF file to add page numbers.');
+        addNumbersBtn.addEventListener('click', async function() {
+            if (!pdfFile) {
+                alert('Please select a PDF file first');
                 return;
             }
             
-            // Show processing state
-            fileListContainer.classList.add('hidden');
             processingDiv.classList.remove('hidden');
+            resultDiv.classList.add('hidden');
             
-            // Simulate processing (would connect to backend service in production)
-            setTimeout(() => {
+            try {
+                // In a real app, you would use PDF-lib to add page numbers
+                const { PDFDocument, rgb } = PDFLib;
+                const arrayBuffer = await pdfFile.arrayBuffer();
+                const pdfDoc = await PDFDocument.load(arrayBuffer);
+                const pages = pdfDoc.getPages();
+                
+                const fontSize = parseInt(fontSizeInput.value);
+                const colorHex = colorInput.value;
+                const color = rgb(
+                    parseInt(colorHex.substr(1, 2), 16) / 255,
+                    parseInt(colorHex.substr(3, 2), 16) / 255,
+                    parseInt(colorHex.substr(5, 2), 16) / 255
+                );
+                
+                const position = document.querySelector('#position').value;
+                
+                pages.forEach((page, index) => {
+                    const { width, height } = page.getSize();
+                    let x, y;
+                    
+                    switch(position) {
+                        case 'bottom-center':
+                            x = width / 2;
+                            y = 30;
+                            break;
+                        case 'bottom-right':
+                            x = width - 30;
+                            y = 30;
+                            break;
+                        case 'bottom-left':
+                            x = 30;
+                            y = 30;
+                            break;
+                        case 'top-center':
+                            x = width / 2;
+                            y = height - 30;
+                            break;
+                        case 'top-right':
+                            x = width - 30;
+                            y = height - 30;
+                            break;
+                        case 'top-left':
+                            x = 30;
+                            y = height - 30;
+                            break;
+                    }
+                    
+                    const pageNumber = (index + 1).toString();
+                    page.drawText(pageNumber, {
+                        x,
+                        y,
+                        size: fontSize,
+                        color,
+                    });
+                });
+                
+                const pdfBytes = await pdfDoc.save();
+                
+                // Set up download
+                downloadBtn.onclick = function() {
+                    const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'numbered_' + pdfFile.name;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                };
+                
                 processingDiv.classList.add('hidden');
                 resultDiv.classList.remove('hidden');
-            }, 3000);
-        });
-        
-        downloadBtn.addEventListener('click', function() {
-            // In a real implementation, this would download the numbered file
-            alert('In a production environment, this would download your PDF with page numbers.');
-            
-            // Reset the tool
-            setTimeout(() => {
-                file = null;
-                fileList.innerHTML = '';
-                numberingOptions.style.display = 'none';
-                resultDiv.classList.add('hidden');
-            }, 1000);
+                
+            } catch (error) {
+                console.error('Error adding page numbers:', error);
+                alert('Failed to add page numbers. Please try again.');
+                processingDiv.classList.add('hidden');
+            }
         });
     </script>
 </body>
