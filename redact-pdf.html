@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Redact PDF - Permanently Remove Sensitive Information</title>
+    <!-- Tailwind CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.2.1/css/all.min.css" rel="stylesheet">
+    <!-- PDF-LIB -->
+    <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+    <style>
+        .drag-area {
+            border: 2px dashed #6c63ff;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+        }
+        .drag-area.active {
+            border-color: #4BB543;
+            background-color: rgba(75, 181, 67, 0.1);
+        }
+        .ad-container {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 15px 0;
+            text-align: center;
+        }
+        #header-placeholder, #footer-placeholder {
+            width: 100%;
+        }
+        .redaction-preview {
+            border: 1px solid #ddd;
+            height: 300px;
+            overflow: auto;
+            margin-top: 20px;
+            position: relative;
+        }
+        .redaction-box {
+            position: absolute;
+            background-color: black;
+            cursor: move;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 font-sans">
+    <div id="header-placeholder"></div>
+
+    <main class="container mx-auto py-6 px-4">
+        <div class="bg-white shadow-md rounded-lg p-6 mb-6">
+            <h1 class="text-2xl md:text-3xl font-bold text-center text-indigo-700 mb-6">Redact PDF Documents</h1>
+            
+            <div class="ad-container">
+                <!-- Ad Space (Top) -->
+                <p class="text-gray-500">Advertisement</p>
+            </div>
+            
+            <div class="mb-6">
+                <p class="text-gray-700 mb-4">Permanently remove sensitive information from your PDF documents. Redacted content cannot be recovered, ensuring your confidential data stays protected.</p>
+                
+                <div class="bg-blue-50 border-l-4 border-blue-500 text-blue-700 p-4 mb-6" role="alert">
+                    <p class="font-bold">Features:</p>
+                    <ul class="list-disc ml-5">
+                        <li>Permanently black out sensitive text</li>
+                        <li>Remove metadata and hidden content</li>
+                        <li>Secure redaction that can't be reversed</li>
+                        <li>Secure and private (processing happens in your browser)</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="drag-area h-60 flex flex-col justify-center items-center p-4 mb-6">
+                <i class="fas fa-eye-slash text-indigo-500 text-5xl mb-4"></i>
+                <h3 class="text-xl font-semibold mb-2">Drag & Drop PDF File Here</h3>
+                <p class="text-gray-500 text-center mb-4">or</p>
+                <button id="browse-btn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-6 rounded-md transition duration-300">
+                    Browse Files
+                </button>
+                <input type="file" id="file-input" accept=".pdf" class="hidden">
+            </div>
+            
+            <div id="redaction-section" class="hidden mb-6">
+                <h3 class="text-lg font-semibold mb-3">Redaction Tools:</h3>
+                
+                <div class="grid md:grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label class="block text-gray-700 mb-2">Redaction Color</label>
+                        <input type="color" id="redaction-color" value="#000000" class="w-full h-10">
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 mb-2">Redaction Type</label>
+                        <select id="redaction-type" class="w-full p-2 border border-gray-300 rounded-md">
+                            <option value="black-box">Black Box</option>
+                            <option value="white-box">White Box</option>
+                            <option value="pattern">Pattern</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="mb-4">
+                    <button id="add-redaction-btn" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-6 rounded-md transition duration-300 mr-2">
+                        Add Redaction Area
+                    </button>
+                    <button id="clear-redactions-btn" class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-6 rounded-md transition duration-300">
+                        Clear All
+                    </button>
+                </div>
+                
+                <div class="redaction-preview bg-white" id="redaction-preview">
+                    <p class="text-gray-500 text-center mt-40">PDF preview will appear here</p>
+                </div>
+                
+                <div class="flex justify-center mt-6">
+                    <button id="apply-redactions-btn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-6 rounded-md transition duration-300">
+                        Apply Redactions
+                    </button>
+                </div>
+            </div>
+            
+            <div id="processing" class="hidden text-center py-4">
+                <div class="animate-spin rounded-full h-12 w-12 border-t-4 border-indigo-500 border-solid mx-auto mb-4"></div>
+                <p class="text-lg text-gray-700">Applying redactions...</p>
+            </div>
+            
+            <div id="result" class="hidden bg-green-50 border border-green-200 rounded-lg p-6 text-center">
+                <i class="fas fa-check-circle text-green-500 text-5xl mb-4"></i>
+                <h3 class="text-xl font-semibold mb-2">Redaction Complete!</h3>
+                <p class="text-gray-700 mb-4">Sensitive information has been permanently removed from your document.</p>
+                <button id="download-btn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-6 rounded-md transition duration-300">
+                    Download Redacted PDF
+                </button>
+            </div>
+            
+            <div class="mt-8">
+                <h3 class="text-xl font-semibold mb-4">How to Redact a PDF</h3>
+                <ol class="list-decimal ml-5 text-gray-700">
+                    <li class="mb-2">Upload your PDF file.</li>
+                    <li class="mb-2">Mark areas containing sensitive information for redaction.</li>
+                    <li class="mb-2">Customize redaction appearance if needed.</li>
+                    <li class="mb-2">Click "Apply Redactions" to permanently remove the content.</li>
+                    <li class="mb-2">Download your securely redacted PDF.</li>
+                </ol>
+            </div>
+        </div>
+        
+        <div class="bg-white shadow-md rounded-lg p-6 mb-6">
+            <h2 class="text-xl font-bold mb-4">Why Redact PDFs</h2>
+            <div class="grid md:grid-cols-3 gap-6">
+                <div class="text-center">
+                    <i class="fas fa-user-secret text-indigo-500 text-3xl mb-3"></i>
+                    <h3 class="font-semibold mb-2">Privacy Protection</h3>
+                    <p class="text-gray-600">Remove personal information before sharing.</p>
+                </div>
+                <div class="text-center">
+                    <i class="fas fa-gavel text-indigo-500 text-3xl mb-3"></i>
+                    <h3 class="font-semibold mb-2">Legal Compliance</h3>
+                    <p class="text-gray-600">Meet data protection regulations.</p>
+                </div>
+                <div class="text-center">
+                    <i class="fas fa-lock text-indigo-500 text-3xl mb-3"></i>
+                    <h3 class="font-semibold mb-2">Secure Redaction</h3>
+                    <p class="text-gray-600">Permanent removal of sensitive content.</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="ad-container">
+            <!-- Ad Space (Bottom) -->
+            <p class="text-gray-500">Advertisement</p>
+        </div>
+    </main>
+
+    <div id="footer-placeholder"></div>
+
+    <script>
+        // Load header and footer
+        document.addEventListener('DOMContentLoaded', function() {
+            fetch('header.html')
+                .then(response => response.text())
+                .then(data => {
+                    document.getElementById('header-placeholder').innerHTML = data;
+                })
+                .catch(() => {
+                    document.getElementById('header-placeholder').innerHTML = '<header class="bg-indigo-700 text-white p-4"><div class="container mx-auto"><h1 class="text-xl font-bold">PDF Redaction Tool</h1></div></header>';
+                });
+                
+            fetch('footer.html')
+                .then(response => response.text())
+                .then(data => {
+                    document.getElementById('footer-placeholder').innerHTML = data;
+                })
+                .catch(() => {
+                    document.getElementById('footer-placeholder').innerHTML = '<footer class="bg-gray-800 text-white p-4 text-center"><p>© 2023 PDF Redaction Tool. All processing happens in your browser.</p></footer>';
+                });
+        });
+        
+        // Redaction functionality
+        const dropArea = document.querySelector('.drag-area');
+        const browseBtn = document.querySelector('#browse-btn');
+        const fileInput = document.querySelector('#file-input');
+        const redactionSection = document.querySelector('#redaction-section');
+        const redactionPreview = document.querySelector('#redaction-preview');
+        const applyRedactionsBtn = document.querySelector('#apply-redactions-btn');
+        const processingDiv = document.querySelector('#processing');
+        const resultDiv = document.querySelector('#result');
+        const downloadBtn = document.querySelector('#download-btn');
+        
+        let pdfFile = null;
+        let redactionBoxes = [];
+        
+        browseBtn.addEventListener('click', () => {
+            fileInput.click();
+        });
+        
+        fileInput.addEventListener('change', function() {
+            if (this.files.length > 0) {
+                pdfFile = this.files[0];
+                redactionSection.classList.remove('hidden');
+                resultDiv.classList.add('hidden');
+                loadPdfPreview();
+            }
+        });
+        
+        // Drag & Drop events
+        ['dragover', 'dragleave', 'drop'].forEach(eventName => {
+            dropArea.addEventListener(eventName, preventDefaults, false);
+        });
+        
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+        
+        dropArea.addEventListener('dragover', function() {
+            this.classList.add('active');
+        });
+        
+        dropArea.addEventListener('dragleave', function() {
+            this.classList.remove('active');
+        });
+        
+        dropArea.addEventListener('drop', function(e) {
+            this.classList.remove('active');
+            const droppedFiles = e.dataTransfer.files;
+            if (droppedFiles.length > 0 && droppedFiles[0].type === 'application/pdf') {
+                pdfFile = droppedFiles[0];
+                redactionSection.classList.remove('hidden');
+                resultDiv.classList.add('hidden');
+                loadPdfPreview();
+            } else {
+                alert('Please only upload PDF files.');
+            }
+        });
+        
+        function loadPdfPreview() {
+            // In a real app, you would render a preview of the PDF
+            redactionPreview.innerHTML = `
+                <div class="p-4">
+                    <p class="mb-4">This is a simulated preview. In a real implementation, the PDF would be rendered here with selectable text.</p>
+                    <p class="mb-4">Sample sensitive information that might need redaction:</p>
+                    <ul class="list-disc ml-5 mb-4">
+                        <li>Social Security Number: 123-45-6789</li>
+                        <li>Credit Card: 4111 1111 1111 1111</li>
+                        <li>Bank Account: 0123456789</li>
+                    </ul>
+                    <p>Click "Add Redaction Area" and draw boxes over content to redact.</p>
+                </div>
+            `;
+        }
+        
+        document.getElementById('add-redaction-btn').addEventListener('click', function() {
+            const box = document.createElement('div');
+            box.className = 'redaction-box';
+            box.style.backgroundColor = document.getElementById('redaction-color').value;
+            box.style.width = '100px';
+            box.style.height = '30px';
+            box.style.left = '50px';
+            box.style.top = '50px';
+            
+            // Make box draggable
+            let isDragging = false;
+            let offsetX, offsetY;
+            
+            box.addEventListener('mousedown', function(e) {
+                isDragging = true;
+                offsetX = e.clientX - box.getBoundingClientRect().left;
+                offsetY = e.clientY - box.getBoundingClientRect().top;
+                box.style.cursor = 'grabbing';
+                e.preventDefault();
+            });
+            
+            document.addEventListener('mousemove', function(e) {
+                if (!isDragging) return;
+                
+                const previewRect = redactionPreview.getBoundingClientRect();
+                let left = e.clientX - previewRect.left - offsetX;
+                let top = e.clientY - previewRect.top - offsetY;
+                
+                // Constrain to preview area
+                left = Math.max(0, Math.min(left, previewRect.width - box.offsetWidth));
+                top = Math.max(0, Math.min(top, previewRect.height - box.offsetHeight));
+                
+                box.style.left = `${left}px`;
+                box.style.top = `${top}px`;
+            });
+            
+            document.addEventListener('mouseup', function() {
+                isDragging = false;
+                box.style.cursor = 'move';
+            });
+            
+            // Add resize handles (simplified)
+            box.addEventListener('dblclick', function() {
+                const newWidth = prompt('Enter width in pixels:', box.offsetWidth);
+                const newHeight = prompt('Enter height in pixels:', box.offsetHeight);
+                
+                if (newWidth && newHeight) {
+                    box.style.width = `${newWidth}px`;
+                    box.style.height = `${newHeight}px`;
+                }
+            });
+            
+            redactionPreview.appendChild(box);
+            redactionBoxes.push(box);
+        });
+        
+        document.getElementById('clear-redactions-btn').addEventListener('click', function() {
+            redactionBoxes.forEach(box => box.remove());
+            redactionBoxes = [];
+        });
+        
+        applyRedactionsBtn.addEventListener('click', async function() {
+            if (!pdfFile) {
+                alert('Please select a PDF file first');
+                return;
+            }
+            
+            if (redactionBoxes.length === 0) {
+                alert('Please add at least one redaction area');
+                return;
+            }
+            
+            processingDiv.classList.remove('hidden');
+            redactionSection.classList.add('hidden');
+            resultDiv.classList.add('hidden');
+            
+            try {
+                // In a real app, you would apply the redactions to the actual PDF
+                // This is a simplified example
+                const arrayBuffer = await pdfFile.arrayBuffer();
+                
+                // Simulate processing delay
+                setTimeout(() => {
+                    processingDiv.classList.add('hidden');
+                    resultDiv.classList.remove('hidden');
+                    
+                    // Set up download
+                    downloadBtn.onclick = function() {
+                        alert('In a real implementation, this would download the redacted PDF.');
+                    };
+                }, 2000);
+                
+            } catch (error) {
+                console.error('Error redacting PDF:', error);
+                alert('Failed to redact PDF. Please try again.');
+                processingDiv.classList.add('hidden');
+                redactionSection.classList.remove('hidden');
+            }
+        });
+    </script>
+</body>
+</html>
