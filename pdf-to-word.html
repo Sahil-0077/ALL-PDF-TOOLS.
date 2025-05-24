@@ -3,294 +3,315 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PDF to Word - Convert PDF to DOC/DOCX</title>
-    <meta name="description" content="Convert your PDF files to editable Word documents with our free online tool. No registration required.">
+    <title>PDF to Word - Convert PDF to Editable DOCX</title>
     <!-- Tailwind CSS -->
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <!-- Font Awesome -->
-    <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.2.1/css/all.min.css" rel="stylesheet">
     <style>
-        .tool-container {
-            min-height: calc(100vh - 250px);
+        .drag-area {
+            border: 2px dashed #6c63ff;
+            border-radius: 5px;
+            transition: all 0.3s ease;
         }
-        .file-drop-area {
-            border: 2px dashed #ccc;
-            border-radius: 8px;
-            padding: 40px;
-            text-align: center;
-            transition: all 0.3s;
+        .drag-area.active {
+            border-color: #4BB543;
+            background-color: rgba(75, 181, 67, 0.1);
         }
-        .file-drop-area:hover, .file-drop-area.highlight {
-            border-color: #3b82f6;
-            background-color: rgba(59, 130, 246, 0.05);
-        }
-        .file-input {
-            position: absolute;
-            left: 0;
-            top: 0;
-            height: 100%;
-            width: 100%;
-            opacity: 0;
-            cursor: pointer;
-        }
-        .ad-placeholder {
+        .file-item {
             background-color: #f8f9fa;
-            border: 1px solid #e9ecef;
-            border-radius: 4px;
-            text-align: center;
-            padding: 20px;
-            margin: 20px 0;
-            color: #6c757d;
+            border-radius: 5px;
+            margin-bottom: 8px;
+            transition: all 0.3s ease;
         }
-        #progressBar {
-            transition: width 0.3s;
+        .file-item:hover {
+            background-color: #e9ecef;
+        }
+        .ad-container {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 15px 0;
+            text-align: center;
+        }
+        #header-placeholder, #footer-placeholder {
+            width: 100%;
+        }
+        .animate-spin {
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
         }
     </style>
 </head>
-<body class="bg-gray-50">
-    <!-- Header placeholder - will be replaced by JavaScript -->
+<body class="bg-gray-50 font-sans">
     <div id="header-placeholder"></div>
 
-    <main class="container mx-auto px-4 py-8 tool-container">
-        <div class="bg-white rounded-lg shadow-md p-6">
-            <h1 class="text-3xl font-bold text-center text-blue-600 mb-2">PDF to Word Converter</h1>
-            <p class="text-center text-gray-600 mb-6">Convert your PDF files to editable DOC/DOCX documents</p>
-
-            <!-- Horizontal Ad -->
-            <div class="ad-placeholder">
-                <span>Advertisement Space</span>
+    <main class="container mx-auto py-6 px-4">
+        <div class="bg-white shadow-md rounded-lg p-6 mb-6">
+            <h1 class="text-2xl md:text-3xl font-bold text-center text-indigo-700 mb-6">PDF to Word Converter</h1>
+            
+            <div class="ad-container">
+                <!-- Ad Space (Top) -->
+                <p class="text-gray-500">Advertisement</p>
             </div>
-
-            <div class="file-drop-area relative mb-6">
-                <div class="p-4">
-                    <i class="fas fa-file-upload text-5xl text-blue-500 mb-4"></i>
-                    <h3 class="text-xl font-semibold mb-2">Drop your PDF files here</h3>
-                    <p class="text-gray-600 mb-4">or click to browse your files</p>
-                    <button class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-full transition">
-                        Select PDF Files
-                    </button>
-                    <input type="file" class="file-input" id="pdfFileInput" accept=".pdf" multiple>
+            
+            <div class="mb-6">
+                <p class="text-gray-700 mb-4">Convert your PDF documents to editable Word files (DOCX) while preserving formatting, images, and layout.</p>
+                
+                <div class="bg-blue-50 border-l-4 border-blue-500 text-blue-700 p-4 mb-6" role="alert">
+                    <p class="font-bold">Features:</p>
+                    <ul class="list-disc ml-5">
+                        <li>Convert PDF to editable Word documents</li>
+                        <li>Preserve original formatting and layout</li>
+                        <li>Extract text and images</li>
+                        <li>Secure and private (processing happens in your browser)</li>
+                    </ul>
                 </div>
             </div>
-
-            <!-- Progress and result section -->
-            <div id="progressSection" class="hidden mb-6">
-                <h3 class="text-lg font-semibold mb-2">Converting...</h3>
-                <div class="w-full bg-gray-200 rounded-full h-2.5">
-                    <div id="progressBar" class="bg-blue-600 h-2.5 rounded-full" style="width: 0%"></div>
-                </div>
-                <p id="progressStatus" class="text-sm text-gray-600 mt-2">Preparing files...</p>
-            </div>
-
-            <div id="resultSection" class="hidden mb-6">
-                <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-4" role="alert">
-                    <p class="font-bold">Conversion Complete!</p>
-                    <p>Your PDF has been successfully converted to Word format.</p>
-                </div>
-                <button id="downloadBtn" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-6 rounded-full transition w-full md:w-auto">
-                    <i class="fas fa-download mr-2"></i> Download Word Document
+            
+            <div class="drag-area h-60 flex flex-col justify-center items-center p-4 mb-6">
+                <i class="fas fa-file-pdf text-indigo-500 text-5xl mb-4"></i>
+                <h3 class="text-xl font-semibold mb-2">Drag & Drop PDF File Here</h3>
+                <p class="text-gray-500 text-center mb-4">or</p>
+                <button id="browse-btn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-6 rounded-md transition duration-300">
+                    Browse Files
                 </button>
+                <input type="file" id="file-input" accept=".pdf" class="hidden">
             </div>
-
-            <!-- Tool information -->
-            <div class="mt-10 border-t pt-6">
-                <h2 class="text-2xl font-bold mb-4">How to Convert PDF to Word</h2>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-                    <div class="bg-blue-50 p-4 rounded-lg">
-                        <div class="text-center">
-                            <div class="inline-flex items-center justify-center h-12 w-12 rounded-full bg-blue-100 text-blue-600 mb-4">
-                                <i class="fas fa-upload"></i>
-                            </div>
-                            <h3 class="text-lg font-semibold mb-2">1. Upload PDF</h3>
-                            <p class="text-gray-600">Drop your PDF file or click to browse your files</p>
-                        </div>
+            
+            <div id="options-section" class="hidden mb-6">
+                <h3 class="text-lg font-semibold mb-3">Conversion Options:</h3>
+                <div class="grid md:grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label class="block text-gray-700 mb-2">Output Format</label>
+                        <select id="output-format" class="w-full p-2 border border-gray-300 rounded-md">
+                            <option value="docx">Word Document (.docx)</option>
+                            <option value="doc">Word 97-2003 (.doc)</option>
+                            <option value="rtf">Rich Text Format (.rtf)</option>
+                        </select>
                     </div>
-                    <div class="bg-blue-50 p-4 rounded-lg">
-                        <div class="text-center">
-                            <div class="inline-flex items-center justify-center h-12 w-12 rounded-full bg-blue-100 text-blue-600 mb-4">
-                                <i class="fas fa-cog"></i>
-                            </div>
-                            <h3 class="text-lg font-semibold mb-2">2. Convert</h3>
-                            <p class="text-gray-600">Our system will automatically convert your PDF to Word format</p>
-                        </div>
-                    </div>
-                    <div class="bg-blue-50 p-4 rounded-lg">
-                        <div class="text-center">
-                            <div class="inline-flex items-center justify-center h-12 w-12 rounded-full bg-blue-100 text-blue-600 mb-4">
-                                <i class="fas fa-download"></i>
-                            </div>
-                            <h3 class="text-lg font-semibold mb-2">3. Download</h3>
-                            <p class="text-gray-600">Download your converted Word document instantly</p>
-                        </div>
+                    <div>
+                        <label class="block text-gray-700 mb-2">Text Recognition</label>
+                        <select id="ocr-mode" class="w-full p-2 border border-gray-300 rounded-md">
+                            <option value="auto">Automatic (recommended)</option>
+                            <option value="text">Text Only</option>
+                            <option value="image">Preserve as Image</option>
+                        </select>
                     </div>
                 </div>
-
-                <h2 class="text-2xl font-bold mb-4">About PDF to Word Conversion</h2>
-                <p class="mb-4">Our PDF to Word converter transforms PDF documents into editable Microsoft Word files (DOC/DOCX), preserving the original formatting as much as possible. This makes it easy to edit, update, or repurpose content that was previously locked in PDF format.</p>
                 
-                <h3 class="text-xl font-semibold mb-3">Features:</h3>
-                <ul class="list-disc pl-5 mb-4">
-                    <li class="mb-2">Convert PDFs to editable Word documents</li>
-                    <li class="mb-2">Preserve text, images, and formatting</li>
-                    <li class="mb-2">Process multi-page PDF documents</li>
-                    <li class="mb-2">Fast conversion speed</li>
-                    <li class="mb-2">No registration required</li>
-                    <li class="mb-2">Free to use</li>
-                </ul>
-                
-                <h3 class="text-xl font-semibold mb-3">When to Use This Tool:</h3>
-                <ul class="list-disc pl-5 mb-4">
-                    <li class="mb-2">When you need to edit the content of a PDF document</li>
-                    <li class="mb-2">When you want to extract and reuse text from a PDF</li>
-                    <li class="mb-2">When you need to update information in a PDF form or document</li>
-                    <li class="mb-2">When you need to incorporate PDF content into a Word document</li>
-                </ul>
+                <div class="flex justify-center">
+                    <button id="convert-btn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-6 rounded-md transition duration-300">
+                        Convert to Word
+                    </button>
+                </div>
             </div>
-
-            <!-- Vertical Ad -->
-            <div class="ad-placeholder">
-                <span>Advertisement Space</span>
+            
+            <div id="processing" class="hidden text-center py-4">
+                <div class="animate-spin rounded-full h-12 w-12 border-t-4 border-indigo-500 border-solid mx-auto mb-4"></div>
+                <p class="text-lg text-gray-700">Converting PDF to Word...</p>
             </div>
+            
+            <div id="result" class="hidden bg-green-50 border border-green-200 rounded-lg p-6 text-center">
+                <i class="fas fa-check-circle text-green-500 text-5xl mb-4"></i>
+                <h3 class="text-xl font-semibold mb-2">Conversion Successful!</h3>
+                <p class="text-gray-700 mb-4">Your PDF has been converted to an editable Word document.</p>
+                <button id="download-btn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-6 rounded-md transition duration-300">
+                    Download Word File
+                </button>
+                <p class="text-sm text-gray-500 mt-2">If download doesn't start automatically, click the button above</p>
+            </div>
+            
+            <div class="mt-8">
+                <h3 class="text-xl font-semibold mb-4">How to Convert PDF to Word</h3>
+                <ol class="list-decimal ml-5 text-gray-700">
+                    <li class="mb-2">Upload your PDF file.</li>
+                    <li class="mb-2">Select your preferred output format and options.</li>
+                    <li class="mb-2">Click "Convert to Word" to begin the process.</li>
+                    <li class="mb-2">Download your editable Word document.</li>
+                </ol>
+            </div>
+        </div>
+        
+        <div class="bg-white shadow-md rounded-lg p-6 mb-6">
+            <h2 class="text-xl font-bold mb-4">Why Convert PDF to Word</h2>
+            <div class="grid md:grid-cols-3 gap-6">
+                <div class="text-center">
+                    <i class="fas fa-edit text-indigo-500 text-3xl mb-3"></i>
+                    <h3 class="font-semibold mb-2">Edit Documents</h3>
+                    <p class="text-gray-600">Make changes to previously uneditable PDFs.</p>
+                </div>
+                <div class="text-center">
+                    <i class="fas fa-file-word text-indigo-500 text-3xl mb-3"></i>
+                    <h3 class="font-semibold mb-2">Word Compatibility</h3>
+                    <p class="text-gray-600">Open and edit in Microsoft Word.</p>
+                </div>
+                <div class="text-center">
+                    <i class="fas fa-exchange-alt text-indigo-500 text-3xl mb-3"></i>
+                    <h3 class="font-semibold mb-2">Reuse Content</h3>
+                    <p class="text-gray-600">Extract text and images for other uses.</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="ad-container">
+            <!-- Ad Space (Bottom) -->
+            <p class="text-gray-500">Advertisement</p>
         </div>
     </main>
 
-    <!-- Footer placeholder - will be replaced by JavaScript -->
     <div id="footer-placeholder"></div>
 
     <script>
         // Load header and footer
         document.addEventListener('DOMContentLoaded', function() {
-            // Load header
             fetch('header.html')
                 .then(response => response.text())
                 .then(data => {
                     document.getElementById('header-placeholder').innerHTML = data;
                 })
-                .catch(error => {
-                    console.error('Error loading header:', error);
-                    document.getElementById('header-placeholder').innerHTML = '<header class="bg-blue-600 text-white p-4"><div class="container mx-auto"><h1 class="text-2xl font-bold">PDF Tools</h1></div></header>';
+                .catch(() => {
+                    document.getElementById('header-placeholder').innerHTML = '<header class="bg-indigo-700 text-white p-4"><div class="container mx-auto"><h1 class="text-xl font-bold">PDF to Word</h1></div></header>';
                 });
-
-            // Load footer
+                
             fetch('footer.html')
                 .then(response => response.text())
                 .then(data => {
                     document.getElementById('footer-placeholder').innerHTML = data;
                 })
-                .catch(error => {
-                    console.error('Error loading footer:', error);
-                    document.getElementById('footer-placeholder').innerHTML = '<footer class="bg-gray-800 text-white p-4"><div class="container mx-auto text-center"><p>&copy; 2023 PDF Tools. All rights reserved.</p></div></footer>';
+                .catch(() => {
+                    document.getElementById('footer-placeholder').innerHTML = '<footer class="bg-gray-800 text-white p-4 text-center"><p>© 2023 PDF to Word Converter. All processing happens in your browser.</p></footer>';
                 });
-
-            // File drop area functionality
-            const dropArea = document.querySelector('.file-drop-area');
-            const fileInput = document.getElementById('pdfFileInput');
-
-            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-                dropArea.addEventListener(eventName, preventDefaults, false);
-            });
-
-            function preventDefaults(e) {
-                e.preventDefault();
-                e.stopPropagation();
+        });
+        
+        // Conversion functionality with fixed download for all devices
+        const dropArea = document.querySelector('.drag-area');
+        const browseBtn = document.querySelector('#browse-btn');
+        const fileInput = document.querySelector('#file-input');
+        const optionsSection = document.querySelector('#options-section');
+        const convertBtn = document.querySelector('#convert-btn');
+        const processingDiv = document.querySelector('#processing');
+        const resultDiv = document.querySelector('#result');
+        const downloadBtn = document.querySelector('#download-btn');
+        
+        let pdfFile = null;
+        
+        browseBtn.addEventListener('click', () => {
+            fileInput.click();
+        });
+        
+        fileInput.addEventListener('change', function() {
+            if (this.files.length > 0) {
+                pdfFile = this.files[0];
+                optionsSection.classList.remove('hidden');
             }
-
-            ['dragenter', 'dragover'].forEach(eventName => {
-                dropArea.addEventListener(eventName, highlight, false);
-            });
-
-            ['dragleave', 'drop'].forEach(eventName => {
-                dropArea.addEventListener(eventName, unhighlight, false);
-            });
-
-            function highlight() {
-                dropArea.classList.add('highlight');
+        });
+        
+        // Drag & Drop events
+        ['dragover', 'dragleave', 'drop'].forEach(eventName => {
+            dropArea.addEventListener(eventName, preventDefaults, false);
+        });
+        
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+        
+        dropArea.addEventListener('dragover', function() {
+            this.classList.add('active');
+        });
+        
+        dropArea.addEventListener('dragleave', function() {
+            this.classList.remove('active');
+        });
+        
+        dropArea.addEventListener('drop', function(e) {
+            this.classList.remove('active');
+            const droppedFiles = e.dataTransfer.files;
+            if (droppedFiles.length > 0 && droppedFiles[0].type === 'application/pdf') {
+                pdfFile = droppedFiles[0];
+                optionsSection.classList.remove('hidden');
+            } else {
+                alert('Please only upload PDF files.');
             }
-
-            function unhighlight() {
-                dropArea.classList.remove('highlight');
+        });
+        
+        // Universal download function that works on all devices
+        function downloadFile(filename, blob) {
+            // Create a blob URL
+            const url = URL.createObjectURL(blob);
+            
+            // Method 1: Try using the download attribute
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            a.style.display = 'none';
+            document.body.appendChild(a);
+            a.click();
+            
+            // Clean up
+            setTimeout(() => {
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            }, 100);
+            
+            // Method 2: For iOS devices, open in new tab as fallback
+            if (/iPhone|iPad|iPod/i.test(navigator.userAgent)) {
+                window.open(url, '_blank');
             }
-
-            dropArea.addEventListener('drop', handleDrop, false);
-
-            function handleDrop(e) {
-                const dt = e.dataTransfer;
-                const files = dt.files;
-                fileInput.files = files;
-                handleFiles(files);
+        }
+        
+        convertBtn.addEventListener('click', async function() {
+            if (!pdfFile) {
+                alert('Please select a PDF file first');
+                return;
             }
-
-            fileInput.addEventListener('change', function() {
-                handleFiles(this.files);
-            });
-
-            function handleFiles(files) {
-                if (files.length === 0) return;
+            
+            processingDiv.classList.remove('hidden');
+            optionsSection.classList.add('hidden');
+            resultDiv.classList.add('hidden');
+            
+            try {
+                // Simulate conversion process (replace with actual conversion)
+                const outputFormat = document.getElementById('output-format').value;
+                const extension = outputFormat === 'docx' ? '.docx' : 
+                                 outputFormat === 'doc' ? '.doc' : '.rtf';
+                const filename = pdfFile.name.replace('.pdf', '') + '_converted' + extension;
                 
-                // Validate files are PDFs
-                let allPdfs = true;
-                for (const file of files) {
-                    if (file.type !== 'application/pdf') {
-                        allPdfs = false;
-                        break;
-                    }
+                // Create a dummy Word file for demonstration
+                // In a real app, you would convert the actual PDF here
+                const dummyContent = "This is a simulated Word file content. In a real implementation, this would be your actual converted document.";
+                const blob = new Blob([dummyContent], { 
+                    type: outputFormat === 'docx' ? 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' :
+                          outputFormat === 'doc' ? 'application/msword' :
+                          'application/rtf'
+                });
+                
+                // Set up the download button
+                downloadBtn.onclick = function() {
+                    downloadFile(filename, blob);
+                };
+                
+                // For mobile devices, try to trigger download automatically
+                if (/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) {
+                    setTimeout(() => {
+                        downloadFile(filename, blob);
+                    }, 500);
                 }
-
-                if (!allPdfs) {
-                    alert('Please select only PDF files.');
-                    return;
-                }
-
-                // Show progress section
-                document.getElementById('progressSection').classList.remove('hidden');
-                simulateConversion();
+                
+                processingDiv.classList.add('hidden');
+                resultDiv.classList.remove('hidden');
+                
+            } catch (error) {
+                console.error('Error converting PDF:', error);
+                alert('Failed to convert PDF. Please try again.');
+                processingDiv.classList.add('hidden');
+                optionsSection.classList.remove('hidden');
             }
-
-            // Simulate conversion process (for demonstration)
-            function simulateConversion() {
-                const progressBar = document.getElementById('progressBar');
-                const progressStatus = document.getElementById('progressStatus');
-                let progress = 0;
-
-                const statuses = [
-                    'Preparing files...',
-                    'Analyzing PDF structure...',
-                    'Extracting text and images...',
-                    'Converting to Word format...',
-                    'Finalizing document...'
-                ];
-
-                const interval = setInterval(() => {
-                    progress += 5;
-                    progressBar.style.width = `${progress}%`;
-                    
-                    if (progress === 25) {
-                        progressStatus.textContent = statuses[1];
-                    } else if (progress === 50) {
-                        progressStatus.textContent = statuses[2];
-                    } else if (progress === 75) {
-                        progressStatus.textContent = statuses[3];
-                    } else if (progress === 90) {
-                        progressStatus.textContent = statuses[4];
-                    }
-
-                    if (progress >= 100) {
-                        clearInterval(interval);
-                        progressStatus.textContent = 'Conversion complete!';
-                        
-                        // Show result section
-                        setTimeout(() => {
-                            document.getElementById('progressSection').classList.add('hidden');
-                            document.getElementById('resultSection').classList.remove('hidden');
-                        }, 500);
-                    }
-                }, 150);
-            }
-
-            // Download button (simulation)
-            document.getElementById('downloadBtn').addEventListener('click', function() {
-                alert('This is a demonstration. In a real application, this would download the converted Word file.');
-            });
         });
     </script>
 </body>
